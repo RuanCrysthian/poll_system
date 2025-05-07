@@ -1,13 +1,13 @@
-package com.example.pool_system;
+package com.example.poll_system;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PoolSystemApplication {
+public class PollSystemApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PoolSystemApplication.class, args);
+		SpringApplication.run(PollSystemApplication.class, args);
 	}
 
 }
