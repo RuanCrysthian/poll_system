@@ -13,7 +13,8 @@ public class UserFactory {
             String cpf,
             String email,
             String password,
-            String role) {
+            String role,
+            String urlImageProfile) {
         switch (role.toLowerCase()) {
             case "admin":
                 return User.createAdmin(
@@ -21,14 +22,16 @@ public class UserFactory {
                         name,
                         new Cpf(cpf),
                         new Email(email),
-                        password);
+                        password,
+                        urlImageProfile);
             case "voter":
                 return User.createVoter(
                         UUID.randomUUID().toString(),
                         name,
                         new Cpf(cpf),
                         new Email(email),
-                        password);
+                        password,
+                        urlImageProfile);
             default:
                 throw new BusinessRulesException("Invalid role");
         }

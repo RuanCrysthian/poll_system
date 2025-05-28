@@ -12,6 +12,7 @@ public class User {
     private Email email;
     private String password;
     private UserRole role;
+    private String urlImageProfile;
     private Boolean isActive;
 
     private User(
@@ -20,6 +21,7 @@ public class User {
             Cpf cpf,
             Email email,
             String password,
+            String urlImageProfile,
             UserRole role) {
         this.id = id;
         this.name = name;
@@ -27,6 +29,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.urlImageProfile = urlImageProfile;
         this.isActive = true;
         validate();
     }
@@ -54,8 +57,9 @@ public class User {
             String name,
             Cpf cpf,
             Email email,
-            String password) {
-        return new User(id, name, cpf, email, password, UserRole.ADMIN);
+            String password,
+            String urlImageProfile) {
+        return new User(id, name, cpf, email, password, urlImageProfile, UserRole.ADMIN);
     }
 
     public static User createVoter(
@@ -63,8 +67,9 @@ public class User {
             String name,
             Cpf cpf,
             Email email,
-            String password) {
-        return new User(id, name, cpf, email, password, UserRole.VOTER);
+            String password,
+            String urlImageProfile) {
+        return new User(id, name, cpf, email, password, urlImageProfile, UserRole.VOTER);
     }
 
     public String getId() {
@@ -93,6 +98,10 @@ public class User {
 
     public Boolean getIsActive() {
         return isActive;
+    }
+
+    public String getUrlImageProfile() {
+        return urlImageProfile;
     }
 
 }

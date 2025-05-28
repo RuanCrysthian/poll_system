@@ -1,0 +1,60 @@
+package com.example.poll_system.infrastructure.persistence;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
+import com.example.poll_system.domain.entities.User;
+import com.example.poll_system.domain.gateways.UserRepository;
+
+@Repository
+public class UserRepositoryInMemory implements UserRepository {
+    private final List<User> users = new ArrayList<>();
+
+    @Override
+    public void save(User user) {
+        users.add(user);
+    }
+
+    @Override
+    public Optional<User> findById(String id) {
+        return users.stream()
+                .filter(user -> user.getId().equals(id))
+                .findFirst();
+    }
+
+    @Override
+    public List<User> findAll() {
+        return users;
+    }
+
+    @Override
+    public void delete(String id) {
+        users.removeIf(user -> user.getId().equals(id));
+    }
+
+    @Override
+    public void update(User user) {
+        User existingUser = findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        delete(existingUser.getId());
+        users.add(user);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return users.stream()
+                .filter(user -> user.getEmail().getEmail().equals(email))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByCpf(String cpf) {
+        return users.stream()
+                .filter(user -> user.getCpf().getCpf().equals(cpf))
+                .findFirst();
+    }
+
+}

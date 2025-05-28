@@ -129,4 +129,8 @@ public class Poll {
         return options;
     }
 
+    public void setStatus(PollStatus status) {
+        this.status = status;
+    }
+
 }
