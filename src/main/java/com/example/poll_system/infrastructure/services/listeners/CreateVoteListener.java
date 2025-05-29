@@ -16,7 +16,7 @@ public class CreateVoteListener {
         this.processVote = processVote;
     }
 
-    @RabbitListener(queues = "${app.rabbitmq.queue}")
+    @RabbitListener(queues = "${app.rabbitmq.vote-queue}")
     public void listen(VoteCreatedEvent message) {
         try {
             System.out.println("VoteQueueListener: recebida mensagem -> " + message.getUserId() + ", "
@@ -27,7 +27,6 @@ public class CreateVoteListener {
 
         } catch (Exception e) {
             System.err.println("Erro ao processar voto: " + e.getMessage());
-            // você pode lançar uma exceção aqui para o RabbitMQ tentar reentregar
             throw e;
         }
     }

@@ -24,7 +24,21 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025" # Porta SMTP
+      - "8025:8025" # Interface web para visualizar os emails
+    volumes:
+      - mailhog_data:/data # Usando volume nomeado
     restart: unless-stopped
 
 volumes:
   minio_data: # Define o volume nomeado
+  rabbitmq_data: # Define o volume nomeado para o RabbitMQ
+  mailhog_data: # Define o volume nomeado para o MailHog

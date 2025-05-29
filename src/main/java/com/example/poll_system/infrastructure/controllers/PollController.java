@@ -22,14 +22,14 @@ import com.example.poll_system.domain.gateways.UserRepository;
 @RequestMapping("/api/v1/polls")
 public class PollController {
 
-    private final CreatePoll createPoll;
     private final UserRepository userRepository;
     private final PollOptionRepository pollOptionRepository;
     private final PollRepository pollRepository;
 
-    public PollController(CreatePoll createPoll, UserRepository userRepository,
-            PollOptionRepository pollOptionRepository, PollRepository pollRepository) {
-        this.createPoll = createPoll;
+    public PollController(
+            UserRepository userRepository,
+            PollOptionRepository pollOptionRepository,
+            PollRepository pollRepository) {
         this.userRepository = userRepository;
         this.pollOptionRepository = pollOptionRepository;
         this.pollRepository = pollRepository;

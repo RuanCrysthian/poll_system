@@ -8,10 +8,17 @@ import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.gateways.UserRepository;
+import com.example.poll_system.domain.value_objects.Cpf;
+import com.example.poll_system.domain.value_objects.Email;
 
 @Repository
 public class UserRepositoryInMemory implements UserRepository {
     private final List<User> users = new ArrayList<>();
+
+    public UserRepositoryInMemory() {
+        users.add(User.createAdmin("1", "John Doe", new Cpf("74571762097"), new Email("john.doe@email.com"),
+                "QAZ123qaz*", "fake_url"));
+    }
 
     @Override
     public void save(User user) {

@@ -14,11 +14,17 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.exchange}")
     private String exchangeName;
 
-    @Value("${app.rabbitmq.queue}")
-    private String queueName;
+    @Value("${app.rabbitmq.vote-queue}")
+    private String voteQueueName;
 
-    @Value("${app.rabbitmq.routing-key}")
-    private String routingKey;
+    @Value("${app.rabbitmq.vote-routing-key}")
+    private String voteRoutingKey;
+
+    @Value("${app.rabbitmq.email-queue}")
+    private String emailQueueName;
+
+    @Value("${app.rabbitmq.email-routing-key}")
+    private String emailRoutingKey;
 
     @Bean
     DirectExchange voteExchange() {
@@ -27,11 +33,21 @@ public class RabbitMQConfig {
 
     @Bean
     Queue voteQueue() {
-        return QueueBuilder.durable(queueName).build();
+        return QueueBuilder.durable(voteQueueName).build();
     }
 
     @Bean
     Binding voteBinding(Queue voteQueue, DirectExchange voteExchange) {
-        return BindingBuilder.bind(voteQueue).to(voteExchange).with(routingKey);
+        return BindingBuilder.bind(voteQueue).to(voteExchange).with(voteRoutingKey);
+    }
+
+    @Bean
+    Queue emailQueue() {
+        return QueueBuilder.durable(emailQueueName).build();
+    }
+
+    @Bean
+    Binding emailBinding(Queue emailQueue, DirectExchange voteExchange) {
+        return BindingBuilder.bind(emailQueue).to(voteExchange).with(emailRoutingKey);
     }
 }

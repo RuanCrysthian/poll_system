@@ -42,7 +42,7 @@ public class VoteController {
     public ResponseEntity<Void> createVote(@RequestBody CreateVoteInput input) {
         CreateVote createVote = new SendVoteToQueue(pollOptionRepository, userRepository, eventPublisher);
         createVote.execute(input);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping()
