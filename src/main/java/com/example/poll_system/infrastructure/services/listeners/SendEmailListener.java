@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.example.poll_system.application.usecases.vote.SendEmailVoteProcessedUseCase;
 import com.example.poll_system.application.usecases.vote.dto.VoteProcessedEmailInput;
 import com.example.poll_system.domain.entities.events.VoteProcessedEvent;
+import com.example.poll_system.domain.exceptions.FailedToSendMessageToQueueException;
 
 @Component
 public class SendEmailListener {
@@ -23,6 +24,7 @@ public class SendEmailListener {
     @RabbitListener(queues = "${app.rabbitmq.email-queue}")
     public void listen(VoteProcessedEvent event) {
         try {
+            System.out.println("Tentando enviar email para o usuário em " + LocalDateTime.now().toString());
             VoteProcessedEmailInput input = new VoteProcessedEmailInput(
                     event.getUserEmail(),
                     SUBJECT,
@@ -33,7 +35,7 @@ public class SendEmailListener {
                     + " informando que o voto foi processado.");
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar email " + LocalDateTime.now().toString());
+            throw new FailedToSendMessageToQueueException("Erro ao enviar email");
         }
     }
 }

@@ -26,6 +26,9 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.email-routing-key}")
     private String emailRoutingKey;
 
+    private static final String EMAIL_DLQ_NAME = "email-queue.dlq";
+    private static final String EMAIL_DLQ_ROUTING_KEY = "email-key-dlq";
+
     @Bean
     DirectExchange voteExchange() {
         return new DirectExchange(exchangeName);
@@ -43,11 +46,24 @@ public class RabbitMQConfig {
 
     @Bean
     Queue emailQueue() {
-        return QueueBuilder.durable(emailQueueName).build();
+        return QueueBuilder.durable(emailQueueName)
+                .withArgument("x-dead-letter-exchange", exchangeName)
+                .withArgument("x-dead-letter-routing-key", EMAIL_DLQ_ROUTING_KEY)
+                .build();
     }
 
     @Bean
     Binding emailBinding(Queue emailQueue, DirectExchange voteExchange) {
         return BindingBuilder.bind(emailQueue).to(voteExchange).with(emailRoutingKey);
+    }
+
+    @Bean
+    Queue emailDLQ() {
+        return QueueBuilder.durable(EMAIL_DLQ_NAME).build();
+    }
+
+    @Bean
+    Binding emailDLQBinding(Queue emailDLQ, DirectExchange voteExchange) {
+        return BindingBuilder.bind(emailDLQ).to(voteExchange).with(EMAIL_DLQ_ROUTING_KEY);
     }
 }
