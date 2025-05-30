@@ -27,10 +27,18 @@ The Poll System is an application that enables users to participate in polls thr
 - **Profile Management**: Upload and manage user profile images via MinIO object storage
 - **Input Validation**: CPF and email uniqueness validation
 
+### Poll Management
+- **Poll Creation**: Create polls with multiple options (2-10 options supported)
+- **Poll Scheduling**: Schedule polls with start and end dates
+- **Poll Status Management**: Support for SCHEDULED, OPEN, CLOSED, PAUSED, and CANCELED statuses
+- **Automatic Poll Activation**: Scheduled polls are automatically activated via `PollScheduler`
+- **Poll Validation**: Comprehensive validation rules for dates, options, and ownership
+
 ### Voting System
 - **Asynchronous Vote Processing**: Votes are queued using RabbitMQ for reliable processing
-- **Vote Validation**: Ensures users and poll options exist before processing
+- **Vote Validation**: Ensures users and poll options exist before processing, and polls are open
 - **Vote Status Tracking**: Tracks vote processing status (UNPROCESSED → PROCESSED)
+- **Real-time Poll Status Check**: Validates poll availability before accepting votes
 
 ### Email Notifications
 - **Automated Email Alerts**: Users receive email confirmations when their votes are processed
@@ -41,6 +49,11 @@ The Poll System is an application that enables users to participate in polls thr
 - **Domain Events**: [`VoteCreatedEvent`](src/main/java/com/example/poll_system/domain/entities/events/VoteCreatedEvent.java) and [`VoteProcessedEvent`](src/main/java/com/example/poll_system/domain/entities/events/VoteProcessedEvent.java)
 - **Message Queue Integration**: RabbitMQ for reliable event processing
 - **Decoupled Components**: Event-driven communication between services
+
+### Automated Scheduling
+- **Poll Scheduler**: Automatic activation of scheduled polls when start time is reached
+- **Background Processing**: Scheduled task runs every minute to check for polls to activate
+- **Status Transitions**: Seamless transition from SCHEDULED to OPEN status
 
 ## 🏗️ Architecture
 
@@ -67,13 +80,19 @@ src/main/java/com/example/poll_system/
 
 #### Use Cases
 - [`CreateUser`](src/main/java/com/example/poll_system/application/usecases/user/CreateUser.java) - User registration with image upload
+- [`CreatePoll`](src/main/java/com/example/poll_system/application/usecases/poll/CreatePoll.java) - Poll creation with validation and scheduling
+- [`ActivePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ActivePoll.java) - Manual poll activation from SCHEDULED to OPEN status
 - [`CreateVote`](src/main/java/com/example/poll_system/application/usecases/vote/CreateVote.java) - Vote creation (queued processing)
 - [`ProcessVote`](src/main/java/com/example/poll_system/application/usecases/vote/ProcessVote.java) - Asynchronous vote processing
 - [`SendEmailVoteProcessed`](src/main/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessed.java) - Email notification service
 
 #### Controllers
 - [`UserController`](src/main/java/com/example/poll_system/infrastructure/controllers/UserController.java) - User management endpoints
+- [`PollController`](src/main/java/com/example/poll_system/infrastructure/controllers/PollController.java) - Poll management endpoints
 - [`VoteController`](src/main/java/com/example/poll_system/infrastructure/controllers/VoteController.java) - Voting endpoints
+
+#### Schedulers
+- [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java) - Automatic poll activation service
 
 #### Event Listeners
 - [`CreateVoteListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/CreateVoteListener.java) - Processes vote creation events
@@ -81,14 +100,15 @@ src/main/java/com/example/poll_system/
 
 ## 🛠️ Technologies
 
-- **Framework**: Spring Boot 3.4.5
+- **Framework**: Spring Boot 3.4.5 with `@EnableScheduling` for automated tasks
 - **Language**: Java 21
-- **Message Queue**: RabbitMQ
-- **Object Storage**: MinIO
-- **Email**: Spring Mail with MailHog
-- **Security**: Spring Security with BCrypt
-- **Testing**: JUnit 5, Mockito
-- **Build Tool**: Maven
+- **Message Queue**: RabbitMQ for asynchronous processing
+- **Object Storage**: MinIO for profile image storage
+- **Email**: Spring Mail with MailHog for development
+- **Security**: Spring Security with BCrypt password hashing
+- **Testing**: JUnit 5, Mockito for comprehensive unit testing
+- **Build Tool**: Maven with Surefire for test execution
+- **Scheduling**: Spring `@Scheduled` for poll automation
 
 ## 🚀 Getting Started
 
@@ -137,6 +157,10 @@ After running `docker-compose up -d`, the following services will be available:
 - `POST /api/v1/users` - Create a new user with profile image
 - `GET /api/v1/users` - List all users
 
+### Polls
+- `POST /api/v1/polls` - Create a new poll with options and scheduling
+- `GET /api/v1/polls` - List all polls
+
 ### Votes
 - `POST /api/v1/votes` - Submit a vote (asynchronous processing)
 - `GET /api/v1/votes` - List all votes
@@ -165,6 +189,23 @@ spring.rabbitmq.listener.simple.retry.enabled=true
 spring.rabbitmq.listener.simple.retry.max-attempts=5
 ```
 
+## ⏰ Automated Scheduling
+
+The system includes an automated polling scheduler that manages poll lifecycle:
+
+### PollScheduler Features
+- **Automatic Activation**: Scheduled polls are automatically opened when their start time is reached
+- **Fixed Rate Execution**: Runs every 60 seconds to check for polls ready to be activated
+- **Efficient Querying**: Only retrieves polls with `SCHEDULED` status for processing
+- **Logging**: Provides console output for monitoring poll activation events
+
+### Configuration
+The scheduler is enabled via the `@EnableScheduling` annotation in the main application class and runs with a fixed rate of 60,000 milliseconds (1 minute).
+
+### Use Cases Integration
+- **Manual Activation**: Use [`ActivePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ActivePoll.java) use case for immediate poll activation
+- **Scheduled Activation**: [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java) handles automatic activation based on start dates
+
 ## 🐳 Infrastructure
 
 The [`docker-compose.yml`](docker-compose.yml) includes:
@@ -187,17 +228,27 @@ The project includes comprehensive unit tests:
 
 ### Test Coverage
 
-- **Use Cases**: [`CreateUserImplTest`](src/test/java/com/example/poll_system/application/usecases/user/impl/CreateUserImplTest.java), [`SendEmailVoteProcessedTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessedTest.java)
+- **Use Cases**: [`CreateUserImplTest`](src/test/java/com/example/poll_system/application/usecases/user/impl/CreateUserImplTest.java), [`CreatePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/CreatePollImplTest.java), [`ActivePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/ActivePollImplTest.java), [`ProcessVoteImplTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/ProcessVoteImplTest.java), [`SendVoteToQueueTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendVoteToQueueTest.java), [`SendEmailVoteProcessedTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessedTest.java)
+- **Domain Entities**: [`PollTest`](src/test/java/com/example/poll_system/domain/entities/PollTest.java), [`VoteTest`](src/test/java/com/example/poll_system/domain/entities/VoteTest.java), [`UserTest`](src/test/java/com/example/poll_system/domain/entities/UserTest.java), [`PollOptionTest`](src/test/java/com/example/poll_system/domain/entities/PollOptionTest.java)
 - **Domain Events**: [`VoteCreatedEventTest`](src/test/java/com/example/poll_system/domain/entities/events/VoteCreatedEventTest.java), [`VoteProcessedEventTest`](src/test/java/com/example/poll_system/domain/entities/events/VoteProcessedEventTest.java)
+- **Factories**: [`PollFactoryTest`](src/test/java/com/example/poll_system/domain/factories/PollFactoryTest.java), [`UserFactoryTest`](src/test/java/com/example/poll_system/domain/factories/UserFactoryTest.java), [`VoteFactoryTest`](src/test/java/com/example/poll_system/domain/factories/VoteFactoryTest.java)
 - **Integration Tests**: Queue processing and email sending
 
 ## 🔄 Workflow
 
 1. **User Registration**: Users register with profile image upload to MinIO
-2. **Vote Submission**: Votes are validated and queued in RabbitMQ
-3. **Asynchronous Processing**: [`CreateVoteListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/CreateVoteListener.java) processes votes from queue
-4. **Email Notification**: [`SendEmailListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/SendEmailListener.java) sends confirmation emails
-5. **Event Tracking**: All actions are tracked via domain events
+2. **Poll Creation**: Admins create polls with scheduling options (immediate or future start)
+3. **Automatic Poll Activation**: [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java) automatically activates scheduled polls when start time is reached
+4. **Vote Submission**: Votes are validated (user exists, poll option exists, poll is open) and queued in RabbitMQ
+5. **Asynchronous Processing**: [`CreateVoteListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/CreateVoteListener.java) processes votes from queue
+6. **Email Notification**: [`SendEmailListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/SendEmailListener.java) sends confirmation emails
+7. **Event Tracking**: All actions are tracked via domain events
+
+### Poll Lifecycle
+
+1. **SCHEDULED** → Poll is created with future start date
+2. **OPEN** → Poll is activated and accepting votes (manual via [`ActivePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ActivePoll.java) or automatic via [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java))
+3. **CLOSED** → Poll is closed and no longer accepting votes
 
 ## 📝 Contributing
 
