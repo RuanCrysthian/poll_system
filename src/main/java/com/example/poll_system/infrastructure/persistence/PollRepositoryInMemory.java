@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Poll;
+import com.example.poll_system.domain.enums.PollStatus;
 import com.example.poll_system.domain.exceptions.EntityNotFoundException;
 import com.example.poll_system.domain.gateways.PollRepository;
 
@@ -43,6 +44,13 @@ public class PollRepositoryInMemory implements PollRepository {
     @Override
     public void delete(String id) {
         polls.removeIf(poll -> poll.getId().equals(id));
+    }
+
+    @Override
+    public List<Poll> findByStatus(PollStatus status) {
+        return polls.stream()
+                .filter(poll -> poll.getStatus() == status)
+                .toList();
     }
 
 }
