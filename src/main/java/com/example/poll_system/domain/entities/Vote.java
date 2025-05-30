@@ -27,13 +27,13 @@ public class Vote {
     }
 
     private void validate() {
-        if (id == null || id.isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             throw new FieldIsRequiredException("id is required");
         }
-        if (userId == null || userId.isEmpty()) {
+        if (userId == null || userId.trim().isEmpty()) {
             throw new FieldIsRequiredException("userId is required");
         }
-        if (pollOptionId == null || pollOptionId.isEmpty()) {
+        if (pollOptionId == null || pollOptionId.trim().isEmpty()) {
             throw new FieldIsRequiredException("pollOptionId is required");
         }
         if (createdAt == null) {

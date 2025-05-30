@@ -1,6 +1,7 @@
 package com.example.poll_system.domain.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
@@ -301,6 +302,94 @@ public class PollTest {
         assertThrows(BusinessRulesException.class, () -> {
             Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
         });
+    }
+
+    @Test
+    void shouldChangeStatusToClosed() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        assertEquals(PollStatus.SCHEDULED, poll.getStatus());
+        poll.setStatus(PollStatus.CLOSED);
+
+        assertEquals(PollStatus.CLOSED, poll.getStatus());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTryingOpenPollWithStatusDifferentThanScheduled() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        poll.setStatus(PollStatus.CLOSED);
+
+        assertThrows(BusinessRulesException.class, () -> {
+            poll.open();
+        });
+    }
+
+    @Test
+    void shouldOpenPoll() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        poll.open();
+
+        assertEquals(PollStatus.OPEN, poll.getStatus());
+        assertNotNull(poll.getStartDate());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTryingClosePollWithStatusDifferentThanOpen() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        poll.setStatus(PollStatus.CLOSED);
+
+        assertThrows(BusinessRulesException.class, () -> {
+            poll.close();
+        });
+    }
+
+    @Test
+    void shouldClosePoll() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        poll.open();
+        poll.close();
+
+        assertEquals(PollStatus.CLOSED, poll.getStatus());
+        assertNotNull(poll.getEndDate());
     }
 
 }

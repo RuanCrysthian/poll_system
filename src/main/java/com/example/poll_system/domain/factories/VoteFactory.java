@@ -8,7 +8,7 @@ import com.example.poll_system.domain.enums.VoteStatus;
 
 public class VoteFactory {
 
-    public static Vote createVote(String userId, String pollOptionId) {
+    public static Vote create(String userId, String pollOptionId) {
         return new Vote(
                 UUID.randomUUID().toString(),
                 userId,

@@ -1,6 +1,5 @@
 package com.example.poll_system.application.usecases.poll.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,25 +35,30 @@ public class CreatePollImpl implements CreatePoll {
     @Override
     public CreatePollOutput execute(CreatePollInput input) {
         validateInput(input);
-        // adicionar cada pollOption no banco de dados
         String pollId = UUID.randomUUID().toString();
-        List<PollOption> pollOptions = new ArrayList<>();
-        input.options().forEach(pollOption -> {
-            PollOption option = PollOptionFactory.create(pollOption.description(), pollId);
-            pollOptionRepository.save(option);
-            pollOptions.add(option);
-        });
-        // criar a poll
+        List<PollOption> pollOptions = input.options().stream()
+                .map(p -> PollOptionFactory.create(p.description(), pollId))
+                .toList();
+        pollOptionRepository.saveAll(pollOptions);
         Poll poll = PollFactory.create(
                 pollId,
                 input.title(),
                 input.description(),
-                input.ownerId(), input.startDate(),
+                input.ownerId(),
+                input.startDate(),
                 input.endDate(),
                 pollOptions);
         pollRepository.save(poll);
-        // criar o output
-        CreatePollOutput output = new CreatePollOutput(
+        return toOutput(poll);
+    }
+
+    private void validateInput(CreatePollInput input) {
+        userRepository.findById(input.ownerId())
+                .orElseThrow(() -> new BusinessRulesException("Owner not found."));
+    }
+
+    private CreatePollOutput toOutput(Poll poll) {
+        return new CreatePollOutput(
                 poll.getId(),
                 poll.getTitle(),
                 poll.getDescription(),
@@ -67,13 +71,5 @@ public class CreatePollImpl implements CreatePoll {
                                 option.getId(),
                                 option.getDescription()))
                         .toList());
-        return output;
     }
-
-    private void validateInput(CreatePollInput input) {
-        if (!userRepository.findById(input.ownerId()).isPresent()) {
-            throw new BusinessRulesException("aowner not found");
-        }
-    }
-
 }

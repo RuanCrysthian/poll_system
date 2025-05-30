@@ -26,4 +26,11 @@ public class PollOptionRepositoryInMemory implements PollOptionRepository {
                 .findFirst();
     }
 
+    @Override
+    public void saveAll(List<PollOption> pollOptions) {
+        for (PollOption option : pollOptions) {
+            save(option);
+        }
+    }
+
 }

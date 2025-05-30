@@ -59,9 +59,8 @@ public class CreatePollImplTest {
         return options;
     }
 
-    private
-
-    @Test void shouldThrowExceptionWhenOwnerDoesNotExist() {
+    @Test
+    void shouldThrowExceptionWhenOwnerDoesNotExist() {
         Mockito.when(userRepository.findById(Mockito.anyString()))
                 .thenReturn(Optional.empty());
         Assertions.assertThrows(BusinessRulesException.class, () -> {
@@ -102,7 +101,8 @@ public class CreatePollImplTest {
             Assertions.assertEquals(input.options().get(i).description(), output.options().get(i).description());
         }
         Mockito.verify(pollRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(pollOptionRepository, Mockito.times(input.options().size())).save(Mockito.any());
+        Mockito.verify(pollOptionRepository, Mockito.times(1)).saveAll(Mockito.anyList());
         Mockito.verify(userRepository, Mockito.times(1)).findById(Mockito.anyString());
     }
+
 }

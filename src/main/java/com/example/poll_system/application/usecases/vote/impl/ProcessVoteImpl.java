@@ -9,7 +9,7 @@ import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.entities.Vote;
 import com.example.poll_system.domain.entities.events.VoteProcessedEvent;
 import com.example.poll_system.domain.enums.VoteStatus;
-import com.example.poll_system.domain.exceptions.BusinessRulesException;
+import com.example.poll_system.domain.exceptions.EntityNotFoundException;
 import com.example.poll_system.domain.factories.VoteFactory;
 import com.example.poll_system.domain.gateways.UserRepository;
 import com.example.poll_system.domain.gateways.VoteRepository;
@@ -33,7 +33,7 @@ public class ProcessVoteImpl implements ProcessVote {
 
     @Override
     public ProcessVoteOutput execute(ProcessVoteInput input) {
-        Vote vote = VoteFactory.createVote(input.userId(), input.pollOptionId());
+        Vote vote = VoteFactory.create(input.userId(), input.pollOptionId());
         vote.setStatus(VoteStatus.PROCESSED);
         voteRepository.save(vote);
         User user = getValidatedUser(vote.getUserId());
@@ -43,7 +43,7 @@ public class ProcessVoteImpl implements ProcessVote {
 
     private User getValidatedUser(String userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessRulesException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
     private ProcessVoteOutput toOutput(Vote vote) {

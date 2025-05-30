@@ -33,7 +33,7 @@ public class CreateUserImpl implements CreateUser {
         validateInput(input);
         User user = buildUser(input);
         userRepository.save(user);
-        return buildCreateUserOutput(user);
+        return toOutput(user);
     }
 
     private void validateInput(CreateUserInput input) {
@@ -74,7 +74,7 @@ public class CreateUserImpl implements CreateUser {
         }
     }
 
-    private CreateUserOutput buildCreateUserOutput(User user) {
+    private CreateUserOutput toOutput(User user) {
         return new CreateUserOutput(
                 user.getId(),
                 user.getName(),

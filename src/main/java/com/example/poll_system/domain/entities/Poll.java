@@ -133,4 +133,20 @@ public class Poll {
         this.status = status;
     }
 
+    public void open() {
+        if (status != PollStatus.SCHEDULED) {
+            throw new BusinessRulesException("Poll can only be opened if it is scheduled");
+        }
+        this.status = PollStatus.OPEN;
+        this.startDate = LocalDateTime.now();
+    }
+
+    public void close() {
+        if (status != PollStatus.OPEN) {
+            throw new BusinessRulesException("Poll can only be closed if it is open");
+        }
+        this.status = PollStatus.CLOSED;
+        this.endDate = LocalDateTime.now();
+    }
+
 }

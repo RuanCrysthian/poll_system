@@ -35,10 +35,10 @@ public class User {
     }
 
     private void validate() {
-        if (id == null || id.isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             throw new FieldIsRequiredException("id is required");
         }
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.trim().isEmpty()) {
             throw new FieldIsRequiredException("name is required");
         }
         if (cpf == null) {
@@ -47,7 +47,7 @@ public class User {
         if (email == null) {
             throw new FieldIsRequiredException("email is required");
         }
-        if (password == null || password.isEmpty()) {
+        if (password == null || password.trim().isEmpty()) {
             throw new FieldIsRequiredException("password is required");
         }
     }
@@ -96,7 +96,7 @@ public class User {
         return role;
     }
 
-    public Boolean getIsActive() {
+    public Boolean isActive() {
         return isActive;
     }
 
