@@ -392,4 +392,21 @@ public class PollTest {
         assertNotNull(poll.getEndDate());
     }
 
+    @Test
+    void shouldCheckIfPollIsOpen() {
+        String id = "1";
+        String title = "Poll Title";
+        String description = "Poll Description";
+        String ownerId = "ownerId";
+        LocalDateTime startDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(2);
+        List<PollOption> options = List.of(new PollOption("1", "Option 1", id), new PollOption("2", "Option 2", id));
+
+        Poll poll = Poll.createScheduledPoll(id, title, description, ownerId, startDate, endDate, options);
+        assertEquals(false, poll.isOpen());
+
+        poll.open();
+        assertEquals(true, poll.isOpen());
+    }
+
 }

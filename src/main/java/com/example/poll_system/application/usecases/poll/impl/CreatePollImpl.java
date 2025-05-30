@@ -53,7 +53,11 @@ public class CreatePollImpl implements CreatePoll {
     }
 
     private void validateInput(CreatePollInput input) {
-        userRepository.findById(input.ownerId())
+        validateOwnerExists(input.ownerId());
+    }
+
+    private void validateOwnerExists(String ownerId) {
+        userRepository.findById(ownerId)
                 .orElseThrow(() -> new BusinessRulesException("Owner not found."));
     }
 

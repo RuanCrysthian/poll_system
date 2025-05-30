@@ -149,4 +149,8 @@ public class Poll {
         this.endDate = LocalDateTime.now();
     }
 
+    public Boolean isOpen() {
+        return status == PollStatus.OPEN;
+    }
+
 }

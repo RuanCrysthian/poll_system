@@ -14,6 +14,7 @@ import com.example.poll_system.application.usecases.vote.dto.CreateVoteInput;
 import com.example.poll_system.application.usecases.vote.impl.SendVoteToQueue;
 import com.example.poll_system.domain.entities.Vote;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
+import com.example.poll_system.domain.gateways.PollRepository;
 import com.example.poll_system.domain.gateways.UserRepository;
 import com.example.poll_system.domain.gateways.VoteRepository;
 import com.example.poll_system.infrastructure.services.EventPublisher;
@@ -26,21 +27,25 @@ public class VoteController {
     private final UserRepository userRepository;
     private final PollOptionRepository pollOptionRepository;
     private final EventPublisher eventPublisher;
+    private final PollRepository pollRepository;
 
     public VoteController(
             VoteRepository voteRepository,
             UserRepository userRepository,
             PollOptionRepository pollOptionRepository,
-            EventPublisher eventPublisher) {
+            EventPublisher eventPublisher,
+            PollRepository pollRepository) {
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.pollOptionRepository = pollOptionRepository;
         this.eventPublisher = eventPublisher;
+        this.pollRepository = pollRepository;
     }
 
     @PostMapping()
     public ResponseEntity<Void> createVote(@RequestBody CreateVoteInput input) {
-        CreateVote createVote = new SendVoteToQueue(pollOptionRepository, userRepository, eventPublisher);
+        CreateVote createVote = new SendVoteToQueue(pollOptionRepository, userRepository, pollRepository,
+                eventPublisher);
         createVote.execute(input);
         return ResponseEntity.accepted().build();
     }
