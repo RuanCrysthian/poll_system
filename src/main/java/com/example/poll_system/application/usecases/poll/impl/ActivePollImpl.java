@@ -23,10 +23,6 @@ public class ActivePollImpl implements ActivePoll {
     public ActivePollOutput execute(ActivePollInput input) {
         Poll pollToActivate = pollRepository.findById(input.pollId())
                 .orElseThrow(() -> new EntityNotFoundException("Poll not found"));
-        // if (pollToActivate.getStatus() != PollStatus.SCHEDULED) {
-        // throw new BusinessRulesException("Poll is not in a scheduled state and cannot
-        // be activated");
-        // }
         pollToActivate.open();
         pollRepository.update(pollToActivate);
         return toOutput(pollToActivate);
