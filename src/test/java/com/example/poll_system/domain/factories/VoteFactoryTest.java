@@ -18,11 +18,13 @@ public class VoteFactoryTest {
     void shouldCreateVote() {
         String userId = "user123";
         String pollOptionId = "option456";
-        Vote vote = VoteFactory.create(userId, pollOptionId);
+        String pollId = "poll789";
+        Vote vote = VoteFactory.create(userId, pollOptionId, pollId);
 
         Assertions.assertNotNull(vote);
         Assertions.assertEquals(userId, vote.getUserId());
         Assertions.assertEquals(pollOptionId, vote.getPollOptionId());
+        Assertions.assertEquals(pollId, vote.getPollId());
         Assertions.assertNotNull(vote.getId());
         Assertions.assertNotNull(vote.getCreatedAt());
         Assertions.assertEquals(VoteStatus.UNPROCESSED, vote.getStatus());

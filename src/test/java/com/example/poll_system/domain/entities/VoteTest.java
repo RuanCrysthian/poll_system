@@ -17,14 +17,16 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
 
         assertEquals(id, vote.getId());
         assertEquals(userId, vote.getUserId());
         assertEquals(pollOptionId, vote.getPollOptionId());
+        assertEquals(pollId, vote.getPollId());
         assertEquals(createdAt, vote.getCreatedAt());
         assertEquals(status, vote.getStatus());
     }
@@ -34,14 +36,16 @@ public class VoteTest {
         String id = "2";
         String userId = "user789";
         String pollOptionId = "option123";
+        String pollId = "poll456";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.PROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
 
         assertEquals(id, vote.getId());
         assertEquals(userId, vote.getUserId());
         assertEquals(pollOptionId, vote.getPollOptionId());
+        assertEquals(pollId, vote.getPollId());
         assertEquals(createdAt, vote.getCreatedAt());
         assertEquals(status, vote.getStatus());
     }
@@ -51,11 +55,12 @@ public class VoteTest {
         String id = null;
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -64,11 +69,12 @@ public class VoteTest {
         String id = "";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -77,11 +83,12 @@ public class VoteTest {
         String id = "1";
         String userId = null;
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -90,11 +97,12 @@ public class VoteTest {
         String id = "1";
         String userId = "";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -103,11 +111,12 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = null;
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -116,11 +125,12 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -129,11 +139,12 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = null;
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -142,11 +153,12 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = null;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -155,10 +167,11 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         assertEquals(VoteStatus.UNPROCESSED, vote.getStatus());
 
         vote.setStatus(VoteStatus.PROCESSED);
@@ -170,10 +183,11 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.PROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         assertEquals(VoteStatus.PROCESSED, vote.getStatus());
 
         vote.setStatus(VoteStatus.UNPROCESSED);
@@ -185,11 +199,12 @@ public class VoteTest {
         String id = "   ";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -198,11 +213,12 @@ public class VoteTest {
         String id = "1";
         String userId = "   ";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -211,11 +227,54 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "   ";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
         assertThrows(FieldIsRequiredException.class, () -> {
-            new Vote(id, userId, pollOptionId, createdAt, status);
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
+        });
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPollIdIsNull() {
+        String id = "1";
+        String userId = "user123";
+        String pollOptionId = "option456";
+        String pollId = null;
+        LocalDateTime createdAt = LocalDateTime.now();
+        VoteStatus status = VoteStatus.UNPROCESSED;
+
+        assertThrows(FieldIsRequiredException.class, () -> {
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
+        });
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPollIdIsEmpty() {
+        String id = "1";
+        String userId = "user123";
+        String pollOptionId = "option456";
+        String pollId = "";
+        LocalDateTime createdAt = LocalDateTime.now();
+        VoteStatus status = VoteStatus.UNPROCESSED;
+
+        assertThrows(FieldIsRequiredException.class, () -> {
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
+        });
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPollIdIsOnlySpaces() {
+        String id = "1";
+        String userId = "user123";
+        String pollOptionId = "option456";
+        String pollId = "   ";
+        LocalDateTime createdAt = LocalDateTime.now();
+        VoteStatus status = VoteStatus.UNPROCESSED;
+
+        assertThrows(FieldIsRequiredException.class, () -> {
+            new Vote(id, userId, pollOptionId, pollId, createdAt, status);
         });
     }
 
@@ -224,10 +283,11 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.of(2023, 12, 25, 10, 30, 0);
         VoteStatus status = VoteStatus.UNPROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
 
         assertEquals(createdAt, vote.getCreatedAt());
         assertEquals(2023, vote.getCreatedAt().getYear());
@@ -243,14 +303,16 @@ public class VoteTest {
         String id = "very-long-vote-id-123456789";
         String userId = "very-long-user-id-987654321";
         String pollOptionId = "very-long-poll-option-id-456789123";
+        String pollId = "very-long-poll-id-123456789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.UNPROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
 
         assertEquals(id, vote.getId());
         assertEquals(userId, vote.getUserId());
         assertEquals(pollOptionId, vote.getPollOptionId());
+        assertEquals(pollId, vote.getPollId());
         assertEquals(createdAt, vote.getCreatedAt());
         assertEquals(status, vote.getStatus());
     }
@@ -260,14 +322,16 @@ public class VoteTest {
         String id = "12345";
         String userId = "67890";
         String pollOptionId = "54321";
+        String pollId = "98765";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus status = VoteStatus.PROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, status);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, status);
 
         assertEquals(id, vote.getId());
         assertEquals(userId, vote.getUserId());
         assertEquals(pollOptionId, vote.getPollOptionId());
+        assertEquals(pollId, vote.getPollId());
         assertEquals(status, vote.getStatus());
     }
 
@@ -276,10 +340,11 @@ public class VoteTest {
         String id = "1";
         String userId = "user123";
         String pollOptionId = "option456";
+        String pollId = "poll789";
         LocalDateTime createdAt = LocalDateTime.now();
         VoteStatus initialStatus = VoteStatus.UNPROCESSED;
 
-        Vote vote = new Vote(id, userId, pollOptionId, createdAt, initialStatus);
+        Vote vote = new Vote(id, userId, pollOptionId, pollId, createdAt, initialStatus);
 
         // Initial state
         assertEquals(VoteStatus.UNPROCESSED, vote.getStatus());
@@ -300,6 +365,7 @@ public class VoteTest {
         assertEquals(id, vote.getId());
         assertEquals(userId, vote.getUserId());
         assertEquals(pollOptionId, vote.getPollOptionId());
+        assertEquals(pollId, vote.getPollId());
         assertEquals(createdAt, vote.getCreatedAt());
     }
 

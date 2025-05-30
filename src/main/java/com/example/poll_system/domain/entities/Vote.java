@@ -9,6 +9,7 @@ public class Vote {
     private String id;
     private String userId;
     private String pollOptionId;
+    private String pollId;
     private LocalDateTime createdAt;
     private VoteStatus status;
 
@@ -16,11 +17,13 @@ public class Vote {
             String id,
             String userId,
             String pollOptionId,
+            String pollId,
             LocalDateTime createdAt,
             VoteStatus status) {
         this.id = id;
         this.userId = userId;
         this.pollOptionId = pollOptionId;
+        this.pollId = pollId;
         this.createdAt = createdAt;
         this.status = status;
         validate();
@@ -35,6 +38,9 @@ public class Vote {
         }
         if (pollOptionId == null || pollOptionId.trim().isEmpty()) {
             throw new FieldIsRequiredException("pollOptionId is required");
+        }
+        if (pollId == null || pollId.trim().isEmpty()) {
+            throw new FieldIsRequiredException("pollId is required");
         }
         if (createdAt == null) {
             throw new FieldIsRequiredException("createdAt is required");
@@ -54,6 +60,10 @@ public class Vote {
 
     public String getPollOptionId() {
         return pollOptionId;
+    }
+
+    public String getPollId() {
+        return pollId;
     }
 
     public LocalDateTime getCreatedAt() {
