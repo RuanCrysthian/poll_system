@@ -33,6 +33,7 @@ The Poll System is an application that enables users to participate in polls thr
 - **Poll Status Management**: Support for SCHEDULED, OPEN, CLOSED, PAUSED, and CANCELED statuses
 - **Automatic Poll Activation**: Scheduled polls are automatically activated via `PollScheduler`
 - **Manual Poll Closing**: Close open polls manually via `ClosePoll` use case
+- **Poll Statistics**: Get comprehensive voting statistics including total votes and vote counts per option
 - **Poll Validation**: Comprehensive validation rules for dates, options, and ownership
 
 ### Voting System
@@ -55,6 +56,12 @@ The Poll System is an application that enables users to participate in polls thr
 - **Poll Scheduler**: Automatic activation of scheduled polls when start time is reached
 - **Background Processing**: Scheduled task runs every minute to check for polls to activate
 - **Status Transitions**: Seamless transition from SCHEDULED to OPEN status
+
+### Analytics and Reporting
+- **Real-time Statistics**: Get comprehensive voting analytics for any poll regardless of status
+- **Vote Aggregation**: Total vote counts and individual option statistics
+- **Data Integrity**: Statistics calculated directly from processed votes in real-time
+- **Multi-status Support**: View statistics for OPEN, CLOSED, and SCHEDULED polls
 
 ## 🏗️ Architecture
 
@@ -84,6 +91,7 @@ src/main/java/com/example/poll_system/
 - [`CreatePoll`](src/main/java/com/example/poll_system/application/usecases/poll/CreatePoll.java) - Poll creation with validation and scheduling
 - [`ActivePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ActivePoll.java) - Manual poll activation from SCHEDULED to OPEN status
 - [`ClosePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ClosePoll.java) - Manual poll closing from OPEN to CLOSED status
+- [`PollStatistics`](src/main/java/com/example/poll_system/application/usecases/poll/PollStatistics.java) - Get comprehensive poll voting statistics and analytics
 - [`CreateVote`](src/main/java/com/example/poll_system/application/usecases/vote/CreateVote.java) - Vote creation (queued processing)
 - [`ProcessVote`](src/main/java/com/example/poll_system/application/usecases/vote/ProcessVote.java) - Asynchronous vote processing
 - [`SendEmailVoteProcessed`](src/main/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessed.java) - Email notification service
@@ -162,6 +170,7 @@ After running `docker-compose up -d`, the following services will be available:
 ### Polls
 - `POST /api/v1/polls` - Create a new poll with options and scheduling
 - `GET /api/v1/polls` - List all polls
+- `GET /api/v1/polls/{pollId}/statistics` - Get comprehensive poll statistics including vote counts and totals
 
 ### Votes
 - `POST /api/v1/votes` - Submit a vote (asynchronous processing)
@@ -230,7 +239,7 @@ The project includes comprehensive unit tests:
 
 ### Test Coverage
 
-- **Use Cases**: [`CreateUserImplTest`](src/test/java/com/example/poll_system/application/usecases/user/impl/CreateUserImplTest.java), [`CreatePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/CreatePollImplTest.java), [`ActivePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/ActivePollImplTest.java), [`ClosePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/ClosePollImplTest.java), [`ProcessVoteImplTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/ProcessVoteImplTest.java), [`SendVoteToQueueTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendVoteToQueueTest.java), [`SendEmailVoteProcessedTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessedTest.java)
+- **Use Cases**: [`CreateUserImplTest`](src/test/java/com/example/poll_system/application/usecases/user/impl/CreateUserImplTest.java), [`CreatePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/CreatePollImplTest.java), [`ActivePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/ActivePollImplTest.java), [`ClosePollImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/ClosePollImplTest.java), [`PollStatisticsImplTest`](src/test/java/com/example/poll_system/application/usecases/poll/impl/PollStatisticsImplTest.java), [`ProcessVoteImplTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/ProcessVoteImplTest.java), [`SendVoteToQueueTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendVoteToQueueTest.java), [`SendEmailVoteProcessedTest`](src/test/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessedTest.java)
 - **Domain Entities**: [`PollTest`](src/test/java/com/example/poll_system/domain/entities/PollTest.java), [`VoteTest`](src/test/java/com/example/poll_system/domain/entities/VoteTest.java), [`UserTest`](src/test/java/com/example/poll_system/domain/entities/UserTest.java), [`PollOptionTest`](src/test/java/com/example/poll_system/domain/entities/PollOptionTest.java)
 - **Domain Events**: [`VoteCreatedEventTest`](src/test/java/com/example/poll_system/domain/entities/events/VoteCreatedEventTest.java), [`VoteProcessedEventTest`](src/test/java/com/example/poll_system/domain/entities/events/VoteProcessedEventTest.java)
 - **Factories**: [`PollFactoryTest`](src/test/java/com/example/poll_system/domain/factories/PollFactoryTest.java), [`UserFactoryTest`](src/test/java/com/example/poll_system/domain/factories/UserFactoryTest.java), [`VoteFactoryTest`](src/test/java/com/example/poll_system/domain/factories/VoteFactoryTest.java)
