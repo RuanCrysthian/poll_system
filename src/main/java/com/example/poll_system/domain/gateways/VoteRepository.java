@@ -1,6 +1,7 @@
 package com.example.poll_system.domain.gateways;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.example.poll_system.domain.entities.Vote;
@@ -13,4 +14,8 @@ public interface VoteRepository {
     List<Vote> findAll();
 
     void delete(String id);
+
+    List<Vote> findByPollId(String pollId);
+
+    Map<String, Long> countVotesByPollIdGroupedByOptionId(String pollId);
 }
