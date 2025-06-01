@@ -38,7 +38,21 @@ services:
       - mailhog_data:/data # Usando volume nomeado
     restart: unless-stopped
 
+  postgresql:
+    image: postgres:15
+    container_name: postgresql
+    ports:
+      - "5430:5432" # Porta padrão do PostgreSQL
+    environment:
+      - POSTGRES_DB=poll_system_db
+      - POSTGRES_USER=poll_user
+      - POSTGRES_PASSWORD=poll_password
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
 volumes:
   minio_data: # Define o volume nomeado
   rabbitmq_data: # Define o volume nomeado para o RabbitMQ
   mailhog_data: # Define o volume nomeado para o MailHog
+  postgresql_data: # Define o volume nomeado para o PostgreSQL

@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.PollOption;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
 
 @Repository
+@Profile("!jpa")
 public class PollOptionRepositoryInMemory implements PollOptionRepository {
 
     private final List<PollOption> pollOptions = new ArrayList<>();
@@ -31,6 +33,13 @@ public class PollOptionRepositoryInMemory implements PollOptionRepository {
         for (PollOption option : pollOptions) {
             save(option);
         }
+    }
+
+    @Override
+    public List<PollOption> findByPollId(String pollId) {
+        return pollOptions.stream()
+                .filter(option -> option.getPollId().equals(pollId))
+                .toList();
     }
 
 }

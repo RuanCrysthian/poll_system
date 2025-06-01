@@ -39,6 +39,30 @@ public class Poll {
         this.validate();
     }
 
+    // Constructor for database reconstruction without validation
+    private Poll(
+            String id,
+            String title,
+            String description,
+            String ownerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            PollStatus status,
+            List<PollOption> options,
+            boolean skipValidation) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.ownerId = ownerId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.options = options;
+        if (!skipValidation) {
+            this.validate();
+        }
+    }
+
     public static Poll createScheduledPoll(
             String id,
             String title,
@@ -59,6 +83,18 @@ public class Poll {
             List<PollOption> options) {
         return new Poll(id, title, description, ownerId, LocalDateTime.now().plusSeconds(1), endDate, PollStatus.OPEN,
                 options);
+    }
+
+    public static Poll fromDatabase(
+            String id,
+            String title,
+            String description,
+            String ownerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            PollStatus status,
+            List<PollOption> options) {
+        return new Poll(id, title, description, ownerId, startDate, endDate, status, options, true);
     }
 
     private void validate() {

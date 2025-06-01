@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.User;
@@ -12,6 +13,7 @@ import com.example.poll_system.domain.value_objects.Cpf;
 import com.example.poll_system.domain.value_objects.Email;
 
 @Repository
+@Profile("!jpa")
 public class UserRepositoryInMemory implements UserRepository {
     private final List<User> users = new ArrayList<>();
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.poll_system.application.usecases.poll.ActivePoll;
 import com.example.poll_system.application.usecases.poll.ClosePoll;
@@ -28,6 +29,7 @@ public class PollScheduler {
     }
 
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void open() {
         System.out.println("Executing PollScheduler at " + LocalDateTime.now());
         List<Poll> scheduledPolls = pollRepository.findByStatus(PollStatus.SCHEDULED);
@@ -42,6 +44,7 @@ public class PollScheduler {
     }
 
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void close() {
         System.out.println("Executing PollScheduler at " + LocalDateTime.now());
         List<Poll> activePolls = pollRepository.findByStatus(PollStatus.OPEN);

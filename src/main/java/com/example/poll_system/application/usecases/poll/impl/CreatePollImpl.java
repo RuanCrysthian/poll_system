@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.poll_system.application.usecases.poll.CreatePoll;
 import com.example.poll_system.application.usecases.poll.dto.CreatePollInput;
@@ -33,13 +34,13 @@ public class CreatePollImpl implements CreatePoll {
     }
 
     @Override
+    @Transactional
     public CreatePollOutput execute(CreatePollInput input) {
         validateInput(input);
         String pollId = UUID.randomUUID().toString();
         List<PollOption> pollOptions = input.options().stream()
                 .map(p -> PollOptionFactory.create(p.description(), pollId))
                 .toList();
-        pollOptionRepository.saveAll(pollOptions);
         Poll poll = PollFactory.create(
                 pollId,
                 input.title(),
@@ -49,6 +50,7 @@ public class CreatePollImpl implements CreatePoll {
                 input.endDate(),
                 pollOptions);
         pollRepository.save(poll);
+        pollOptionRepository.saveAll(pollOptions);
         return toOutput(poll);
     }
 

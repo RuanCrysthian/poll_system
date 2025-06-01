@@ -12,4 +12,6 @@ public interface PollOptionRepository {
 
     Optional<PollOption> findById(String id);
 
+    List<PollOption> findByPollId(String pollId);
+
 }

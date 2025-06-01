@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Vote;
@@ -13,6 +14,7 @@ import com.example.poll_system.domain.enums.VoteStatus;
 import com.example.poll_system.domain.gateways.VoteRepository;
 
 @Repository
+@Profile("!jpa")
 public class VoteRepositoryInMemory implements VoteRepository {
 
     private final List<Vote> votes = new ArrayList<>();

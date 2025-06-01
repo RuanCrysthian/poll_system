@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Poll;
@@ -12,6 +13,7 @@ import com.example.poll_system.domain.exceptions.EntityNotFoundException;
 import com.example.poll_system.domain.gateways.PollRepository;
 
 @Repository
+@Profile("!jpa")
 public class PollRepositoryInMemory implements PollRepository {
 
     private final List<Poll> polls = new ArrayList<>();
