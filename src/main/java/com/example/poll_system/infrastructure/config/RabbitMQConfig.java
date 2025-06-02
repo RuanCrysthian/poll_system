@@ -38,11 +38,6 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.email-routing-key-dlq}")
     private String emailDeadLetterQueueRoutingKey;
 
-    private static final String EMAIL_DLQ_NAME = "email-queue.dlq";
-    private static final String EMAIL_DLQ_ROUTING_KEY = "email-key-dlq";
-    private static final String VOTE_DLQ_NAME = "vote-queue.dlq";
-    private static final String VOTE_DLQ_ROUTING_KEY = "vote-key-dlq";
-
     @Bean
     DirectExchange voteExchange() {
         return new DirectExchange(exchangeName);
