@@ -12,6 +12,7 @@ import com.example.poll_system.application.usecases.poll.dto.CreatePollOutput;
 import com.example.poll_system.application.usecases.poll.dto.PollOptionOutput;
 import com.example.poll_system.domain.entities.Poll;
 import com.example.poll_system.domain.entities.PollOption;
+import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.exceptions.BusinessRulesException;
 import com.example.poll_system.domain.factories.PollFactory;
 import com.example.poll_system.domain.factories.PollOptionFactory;
@@ -55,12 +56,15 @@ public class CreatePollImpl implements CreatePoll {
     }
 
     private void validateInput(CreatePollInput input) {
-        validateOwnerExists(input.ownerId());
+        validateOwner(input.ownerId());
     }
 
-    private void validateOwnerExists(String ownerId) {
-        userRepository.findById(ownerId)
+    private void validateOwner(String ownerId) {
+        User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new BusinessRulesException("Owner not found."));
+        if (owner.isVoter()) {
+            throw new BusinessRulesException("Owner must be an admin.");
+        }
     }
 
     private CreatePollOutput toOutput(Poll poll) {

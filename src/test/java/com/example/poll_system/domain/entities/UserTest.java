@@ -1,6 +1,7 @@
 package com.example.poll_system.domain.entities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -287,6 +288,50 @@ public class UserTest {
         assertThrows(InvalidFieldException.class, () -> {
             new Email(invalidEmail);
         });
+    }
+
+    @Test
+    void shouldReturnTrueWhenUserIsAdmin() {
+        String id = "1";
+        String name = "Jane Doe";
+        Cpf cpf = new Cpf("74571762097");
+        Email email = new Email("jane.doe@email.com");
+        String password = "password123";
+        String urlImageProfile = "http://example.com/image.jpg";
+
+        User user = User.createAdmin(id, name, cpf, email, password, urlImageProfile);
+
+        assertEquals(UserRole.ADMIN, user.getRole());
+        assertEquals(id, user.getId());
+        assertEquals(name, user.getName());
+        assertEquals(cpf, user.getCpf());
+        assertEquals(email, user.getEmail());
+        assertEquals(password, user.getPassword());
+        assertEquals(urlImageProfile, user.getUrlImageProfile());
+        assertTrue(user.isAdmin());
+        assertFalse(user.isVoter());
+    }
+
+    @Test
+    void shouldReturnTrueWhenUserIsVoter() {
+        String id = "1";
+        String name = "Jane Doe";
+        Cpf cpf = new Cpf("74571762097");
+        Email email = new Email("jane.doe@email.com");
+        String password = "password123";
+        String urlImageProfile = "http://example.com/image.jpg";
+
+        User user = User.createVoter(id, name, cpf, email, password, urlImageProfile);
+
+        assertEquals(UserRole.VOTER, user.getRole());
+        assertEquals(id, user.getId());
+        assertEquals(name, user.getName());
+        assertEquals(cpf, user.getCpf());
+        assertEquals(email, user.getEmail());
+        assertEquals(password, user.getPassword());
+        assertEquals(urlImageProfile, user.getUrlImageProfile());
+        assertTrue(user.isVoter());
+        assertFalse(user.isAdmin());
     }
 
 }

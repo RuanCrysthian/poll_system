@@ -104,4 +104,12 @@ public class User {
         return urlImageProfile;
     }
 
+    public Boolean isVoter() {
+        return UserRole.VOTER.equals(role);
+    }
+
+    public Boolean isAdmin() {
+        return UserRole.ADMIN.equals(role);
+    }
+
 }

@@ -105,4 +105,28 @@ public class CreatePollImplTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(Mockito.anyString());
     }
 
+    @Test
+    void shouldThrowExceptionWhenOwnerIsVoter() {
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
+        Assertions.assertThrows(BusinessRulesException.class, () -> {
+            List<PollOptionInput> options = createPollOptions();
+            CreatePollInput input = new CreatePollInput(
+                    "Poll Title",
+                    "Poll Description",
+                    LocalDateTime.now(),
+                    LocalDateTime.now().plusDays(1),
+                    user.getId(),
+                    options);
+            createPollImpl.execute(input);
+        });
+    }
+
 }
