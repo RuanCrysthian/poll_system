@@ -17,17 +17,31 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.vote-queue}")
     private String voteQueueName;
 
+    @Value("${app.rabbitmq.vote-queue-dlq}")
+    private String voteDeadLetterQueueName;
+
     @Value("${app.rabbitmq.vote-routing-key}")
     private String voteRoutingKey;
+
+    @Value("${app.rabbitmq.vote-routing-key-dlq}")
+    private String voteDeadLetterQueueRoutingKey;
 
     @Value("${app.rabbitmq.email-queue}")
     private String emailQueueName;
 
+    @Value("${app.rabbitmq.email-queue-dlq}")
+    private String emailDeadLetterQueueName;
+
     @Value("${app.rabbitmq.email-routing-key}")
     private String emailRoutingKey;
 
+    @Value("${app.rabbitmq.email-routing-key-dlq}")
+    private String emailDeadLetterQueueRoutingKey;
+
     private static final String EMAIL_DLQ_NAME = "email-queue.dlq";
     private static final String EMAIL_DLQ_ROUTING_KEY = "email-key-dlq";
+    private static final String VOTE_DLQ_NAME = "vote-queue.dlq";
+    private static final String VOTE_DLQ_ROUTING_KEY = "vote-key-dlq";
 
     @Bean
     DirectExchange voteExchange() {
@@ -36,7 +50,10 @@ public class RabbitMQConfig {
 
     @Bean
     Queue voteQueue() {
-        return QueueBuilder.durable(voteQueueName).build();
+        return QueueBuilder.durable(voteQueueName)
+                .withArgument("x-dead-letter-exchange", exchangeName)
+                .withArgument("x-dead-letter-routing-key", voteDeadLetterQueueRoutingKey)
+                .build();
     }
 
     @Bean
@@ -48,7 +65,7 @@ public class RabbitMQConfig {
     Queue emailQueue() {
         return QueueBuilder.durable(emailQueueName)
                 .withArgument("x-dead-letter-exchange", exchangeName)
-                .withArgument("x-dead-letter-routing-key", EMAIL_DLQ_ROUTING_KEY)
+                .withArgument("x-dead-letter-routing-key", emailDeadLetterQueueRoutingKey)
                 .build();
     }
 
@@ -59,11 +76,21 @@ public class RabbitMQConfig {
 
     @Bean
     Queue emailDLQ() {
-        return QueueBuilder.durable(EMAIL_DLQ_NAME).build();
+        return QueueBuilder.durable(emailDeadLetterQueueName).build();
     }
 
     @Bean
     Binding emailDLQBinding(Queue emailDLQ, DirectExchange voteExchange) {
-        return BindingBuilder.bind(emailDLQ).to(voteExchange).with(EMAIL_DLQ_ROUTING_KEY);
+        return BindingBuilder.bind(emailDLQ).to(voteExchange).with(emailDeadLetterQueueRoutingKey);
+    }
+
+    @Bean
+    Queue voteDLQ() {
+        return QueueBuilder.durable(voteDeadLetterQueueName).build();
+    }
+
+    @Bean
+    Binding voteDLQBinding(Queue voteDLQ, DirectExchange voteExchange) {
+        return BindingBuilder.bind(voteDLQ).to(voteExchange).with(voteDeadLetterQueueRoutingKey);
     }
 }
