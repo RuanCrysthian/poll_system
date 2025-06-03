@@ -61,13 +61,5 @@ public class FindUserByIdTest {
         Assertions.assertEquals(user.getUrlImageProfile(), output.profilePictureUrl());
         Assertions.assertEquals(user.getRole().name(), output.role());
         Assertions.assertTrue(output.isActive());
-        // Mock the userRepository.findById method to return a valid user
-        // User mockUser = createMockUser(userId); // Implement this method to create a
-        // mock user
-        // Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-
-        // FindUserByIdOutput output = findUserById.execute(input);
-        // Assertions.assertNotNull(output);
-        // Assertions.assertEquals(userId, output.userId());
     }
 }
