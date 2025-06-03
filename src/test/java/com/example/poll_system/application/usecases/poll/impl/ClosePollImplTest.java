@@ -16,16 +16,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.example.poll_system.application.usecases.poll.dto.ClosePollInput;
 import com.example.poll_system.application.usecases.poll.dto.ClosePollOutput;
 import com.example.poll_system.domain.entities.Poll;
 import com.example.poll_system.domain.entities.PollOption;
+import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.enums.PollStatus;
 import com.example.poll_system.domain.exceptions.BusinessRulesException;
 import com.example.poll_system.domain.exceptions.EntityNotFoundException;
+import com.example.poll_system.domain.factories.UserFactory;
 import com.example.poll_system.domain.gateways.PollRepository;
+import com.example.poll_system.domain.gateways.UserRepository;
+import com.example.poll_system.infrastructure.services.EventPublisher;
 
 public class ClosePollImplTest {
 
@@ -34,6 +39,12 @@ public class ClosePollImplTest {
 
     @Mock
     private PollRepository pollRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private EventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +84,15 @@ public class ClosePollImplTest {
         String pollId = "poll-123";
         ClosePollInput input = new ClosePollInput(pollId);
         Poll openPoll = createOpenPoll();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(openPoll));
 
         // When
@@ -96,6 +115,7 @@ public class ClosePollImplTest {
 
         verify(pollRepository, times(1)).findById(pollId);
         verify(pollRepository, times(1)).update(any(Poll.class));
+        verify(eventPublisher, times(1)).publish(any());
     }
 
     @Test
@@ -141,7 +161,15 @@ public class ClosePollImplTest {
         String pollId = "poll-closed";
         ClosePollInput input = new ClosePollInput(pollId);
         Poll openPoll = createOpenPoll();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         // Simulate a closed poll by opening and then closing it
         openPoll.close();
 
@@ -163,7 +191,15 @@ public class ClosePollImplTest {
         String pollId = "poll-123";
         ClosePollInput input = new ClosePollInput(pollId);
         Poll openPoll = createOpenPoll();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(openPoll));
 
         // When
@@ -240,7 +276,15 @@ public class ClosePollImplTest {
 
         Poll pollWithMultipleOptions = Poll.createOpenPoll(pollId, title, description, ownerId, endDate, options);
         ClosePollInput input = new ClosePollInput(pollId);
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(pollWithMultipleOptions));
 
         // When
@@ -270,7 +314,15 @@ public class ClosePollImplTest {
         String originalOwnerId = originalPoll.getOwnerId();
         LocalDateTime originalStartDate = originalPoll.getStartDate();
         int originalOptionsCount = originalPoll.getOptions().size();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(originalPoll));
 
         // When
@@ -299,7 +351,15 @@ public class ClosePollImplTest {
         String pollId = "poll-verification";
         ClosePollInput input = new ClosePollInput(pollId);
         Poll openPoll = createOpenPoll();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(openPoll));
 
         // When
@@ -316,7 +376,15 @@ public class ClosePollImplTest {
         String pollId = "poll-option-ids";
         ClosePollInput input = new ClosePollInput(pollId);
         Poll openPoll = createOpenPoll();
-
+        User user = UserFactory.create(
+                "John Doe",
+                "05938337089",
+                "john.doe@email.com",
+                "QAZ123qaz*",
+                "voter",
+                "urlImageProfile");
+        Mockito.when(userRepository.findById(Mockito.anyString()))
+                .thenReturn(Optional.of(user));
         when(pollRepository.findById(pollId)).thenReturn(Optional.of(openPoll));
 
         // When

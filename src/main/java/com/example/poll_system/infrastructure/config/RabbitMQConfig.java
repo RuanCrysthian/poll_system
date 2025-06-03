@@ -35,8 +35,20 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.email-routing-key}")
     private String emailRoutingKey;
 
+    @Value("${app.rabbitmq.email-poll-close.routing-key}")
+    private String emailPollCloseRoutingKey;
+
+    @Value("${app.rabbitmq.email-poll-close.queue}")
+    private String emailPollCloseQueueName;
+
     @Value("${app.rabbitmq.email-routing-key-dlq}")
     private String emailDeadLetterQueueRoutingKey;
+
+    @Value("${app.rabbitmq..email-poll-close.dlq}")
+    private String emailPollCloseDeadLetterQueue;
+
+    @Value("${app.rabbitmq..email-poll-close.dql-routing-key}")
+    private String emailPollCloseDeadLetterQueueRoutingKey;
 
     @Bean
     DirectExchange voteExchange() {
@@ -65,6 +77,14 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    Queue emailPollClosedQueue() {
+        return QueueBuilder.durable(emailPollCloseQueueName)
+                .withArgument("x-dead-letter-exchange", exchangeName)
+                .withArgument("x-dead-letter-routing-key", emailPollCloseDeadLetterQueueRoutingKey)
+                .build();
+    }
+
+    @Bean
     Binding emailBinding(Queue emailQueue, DirectExchange voteExchange) {
         return BindingBuilder.bind(emailQueue).to(voteExchange).with(emailRoutingKey);
     }
@@ -75,8 +95,23 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    Queue emailPollClosedDLQ() {
+        return QueueBuilder.durable(emailPollCloseDeadLetterQueue).build();
+    }
+
+    @Bean
     Binding emailDLQBinding(Queue emailDLQ, DirectExchange voteExchange) {
         return BindingBuilder.bind(emailDLQ).to(voteExchange).with(emailDeadLetterQueueRoutingKey);
+    }
+
+    @Bean
+    Binding emailPollClosedDLQBinding(Queue emailPollClosedDLQ, DirectExchange voteExchange) {
+        return BindingBuilder.bind(emailPollClosedDLQ).to(voteExchange).with(emailPollCloseDeadLetterQueueRoutingKey);
+    }
+
+    @Bean
+    Binding emailPollCloseBinding(Queue emailPollClosedQueue, DirectExchange voteExchange) {
+        return BindingBuilder.bind(emailPollClosedQueue).to(voteExchange).with(emailPollCloseRoutingKey);
     }
 
     @Bean

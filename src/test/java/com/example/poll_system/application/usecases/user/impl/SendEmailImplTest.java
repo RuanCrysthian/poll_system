@@ -1,4 +1,4 @@
-package com.example.poll_system.application.usecases.vote.impl;
+package com.example.poll_system.application.usecases.user.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.example.poll_system.application.usecases.vote.dto.VoteProcessedEmailInput;
+import com.example.poll_system.application.usecases.vote.dto.SendEmailInput;
 import com.example.poll_system.infrastructure.services.MailSender;
 
-public class SendEmailVoteProcessedTest {
+public class SendEmailImplTest {
 
     @InjectMocks
-    private SendEmailVoteProcessed sendEmailVoteProcessed;
+    private SendEmailImpl sendEmailVoteProcessed;
 
     @Mock
     private MailSender mailSender;
@@ -30,7 +30,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "Voto Processado";
         String body = "Seu voto foi processado com sucesso!";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -45,7 +45,7 @@ public class SendEmailVoteProcessedTest {
         String email = "test@example.com";
         String subject = "Test Subject";
         String body = "Test Body Content";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -63,7 +63,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user.name+tag@domain.co.uk";
         String subject = "Important Notification";
         String body = "Your vote has been successfully processed.";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -78,7 +78,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "This is a very long subject line that might be used in real scenarios with detailed information";
         String body = "This is a very detailed body content that includes multiple lines of text and comprehensive information about the vote processing status and additional details that might be relevant to the user.";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -93,7 +93,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "";
         String body = "";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -110,8 +110,8 @@ public class SendEmailVoteProcessedTest {
         String subject = "Notification";
         String body = "Your vote has been processed.";
 
-        VoteProcessedEmailInput input1 = new VoteProcessedEmailInput(email1, subject, body);
-        VoteProcessedEmailInput input2 = new VoteProcessedEmailInput(email2, subject, body);
+        SendEmailInput input1 = new SendEmailInput(email1, subject, body);
+        SendEmailInput input2 = new SendEmailInput(email2, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input1);
@@ -130,7 +130,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "Confirmação: Voto Processado! 🎉";
         String body = "Olá! Seu voto foi processado com sucesso.\n\nDetalhes:\n- Status: ✅ Processado\n- Data: Hoje\n\nObrigado!";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -145,7 +145,7 @@ public class SendEmailVoteProcessedTest {
         String email = "12345@example.com";
         String subject = "Vote Processed";
         String body = "Your vote with ID 67890 has been processed.";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Act
         sendEmailVoteProcessed.execute(input);
@@ -160,7 +160,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "Subject";
         String body = "Body";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         // Configurar o mock para não fazer nada (comportamento padrão)
         Mockito.doNothing().when(mailSender).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
@@ -176,7 +176,7 @@ public class SendEmailVoteProcessedTest {
         String email = "user@example.com";
         String subject = "Subject";
         String body = "Body";
-        VoteProcessedEmailInput input = new VoteProcessedEmailInput(email, subject, body);
+        SendEmailInput input = new SendEmailInput(email, subject, body);
 
         RuntimeException expectedException = new RuntimeException("Mail server unavailable");
         Mockito.doThrow(expectedException).when(mailSender).send(Mockito.anyString(), Mockito.anyString(),
