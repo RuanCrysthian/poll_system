@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.poll_system.application.usecases.vote.CreateVote;
+import com.example.poll_system.application.usecases.vote.FindVoteByIdUseCase;
 import com.example.poll_system.application.usecases.vote.dto.CreateVoteInput;
+import com.example.poll_system.application.usecases.vote.dto.FindVoteByIdInput;
+import com.example.poll_system.application.usecases.vote.dto.FindVoteByIdOutput;
+import com.example.poll_system.application.usecases.vote.impl.FindVoteById;
 import com.example.poll_system.application.usecases.vote.impl.SendVoteToQueue;
 import com.example.poll_system.domain.entities.Vote;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
@@ -53,6 +57,12 @@ public class VoteController {
     @GetMapping()
     public ResponseEntity<List<Vote>> list() {
         return ResponseEntity.ok(voteRepository.findAll());
+    }
+
+    @GetMapping("/{voteId}")
+    public ResponseEntity<FindVoteByIdOutput> findVoteById(String voteId) {
+        FindVoteByIdUseCase findVoteByIdUseCase = new FindVoteById(voteRepository);
+        return ResponseEntity.ok(findVoteByIdUseCase.execute(new FindVoteByIdInput(voteId)));
     }
 
 }

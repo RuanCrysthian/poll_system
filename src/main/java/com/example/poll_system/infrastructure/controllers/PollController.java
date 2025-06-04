@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.poll_system.application.usecases.poll.CreatePoll;
+import com.example.poll_system.application.usecases.poll.FindPollByIdUseCase;
 import com.example.poll_system.application.usecases.poll.PollStatistics;
 import com.example.poll_system.application.usecases.poll.dto.CreatePollInput;
 import com.example.poll_system.application.usecases.poll.dto.CreatePollOutput;
+import com.example.poll_system.application.usecases.poll.dto.FindPollByIdInput;
+import com.example.poll_system.application.usecases.poll.dto.FindPollByIdOutput;
 import com.example.poll_system.application.usecases.poll.dto.PollStatisticsInput;
 import com.example.poll_system.application.usecases.poll.dto.PollStatisticsOutput;
 import com.example.poll_system.application.usecases.poll.impl.CreatePollImpl;
+import com.example.poll_system.application.usecases.poll.impl.FindPollById;
 import com.example.poll_system.application.usecases.poll.impl.PollStatisticsImpl;
 import com.example.poll_system.domain.entities.Poll;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
@@ -54,6 +58,12 @@ public class PollController {
     @GetMapping
     public ResponseEntity<List<Poll>> list() {
         return ResponseEntity.ok(pollRepository.findAll());
+    }
+
+    @GetMapping("/{pollId}")
+    public ResponseEntity<FindPollByIdOutput> findPollById(@PathVariable String pollId) {
+        FindPollByIdUseCase findPollById = new FindPollById(pollRepository);
+        return ResponseEntity.ok(findPollById.execute(new FindPollByIdInput(pollId)));
     }
 
     @GetMapping("/{pollId}/statistics")

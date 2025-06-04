@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.poll_system.application.usecases.user.CreateUser;
+import com.example.poll_system.application.usecases.user.FindUserByIdUseCase;
 import com.example.poll_system.application.usecases.user.dtos.CreateUserInput;
 import com.example.poll_system.application.usecases.user.dtos.CreateUserOutput;
+import com.example.poll_system.application.usecases.user.dtos.FindUserByIdInput;
+import com.example.poll_system.application.usecases.user.dtos.FindUserByIdOutput;
 import com.example.poll_system.application.usecases.user.impl.CreateUserImpl;
+import com.example.poll_system.application.usecases.user.impl.FindUserById;
 import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.gateways.UserRepository;
 import com.example.poll_system.infrastructure.services.ObjectStorage;
@@ -53,5 +57,11 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> list() {
         return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<FindUserByIdOutput> getUserById(@RequestPart("userId") String userId) {
+        FindUserByIdUseCase findUserByIdUseCase = new FindUserById(userRepository);
+        return ResponseEntity.ok(findUserByIdUseCase.execute(new FindUserByIdInput(userId)));
     }
 }
