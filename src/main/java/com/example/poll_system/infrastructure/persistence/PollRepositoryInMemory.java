@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Poll;
@@ -33,6 +36,19 @@ public class PollRepositoryInMemory implements PollRepository {
     @Override
     public List<Poll> findAll() {
         return polls;
+    }
+
+    @Override
+    public Page<Poll> findAll(Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), polls.size());
+
+        if (start >= polls.size()) {
+            return new PageImpl<>(new ArrayList<>(), pageable, polls.size());
+        }
+
+        List<Poll> pageContent = polls.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, polls.size());
     }
 
     @Override

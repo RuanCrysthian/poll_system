@@ -1,7 +1,7 @@
 package com.example.poll_system.infrastructure.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.poll_system.application.usecases.poll.CreatePoll;
 import com.example.poll_system.application.usecases.poll.FindPollByIdUseCase;
+import com.example.poll_system.application.usecases.poll.ListPollUseCase;
 import com.example.poll_system.application.usecases.poll.PollStatistics;
 import com.example.poll_system.application.usecases.poll.dto.CreatePollInput;
 import com.example.poll_system.application.usecases.poll.dto.CreatePollOutput;
 import com.example.poll_system.application.usecases.poll.dto.FindPollByIdInput;
 import com.example.poll_system.application.usecases.poll.dto.FindPollByIdOutput;
+import com.example.poll_system.application.usecases.poll.dto.ListPollOutput;
 import com.example.poll_system.application.usecases.poll.dto.PollStatisticsInput;
 import com.example.poll_system.application.usecases.poll.dto.PollStatisticsOutput;
 import com.example.poll_system.application.usecases.poll.impl.CreatePollImpl;
 import com.example.poll_system.application.usecases.poll.impl.FindPollById;
+import com.example.poll_system.application.usecases.poll.impl.ListPollPageable;
 import com.example.poll_system.application.usecases.poll.impl.PollStatisticsImpl;
-import com.example.poll_system.domain.entities.Poll;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
 import com.example.poll_system.domain.gateways.PollRepository;
 import com.example.poll_system.domain.gateways.UserRepository;
@@ -55,9 +57,15 @@ public class PollController {
         return ResponseEntity.ok(output);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Poll>> list() {
-        return ResponseEntity.ok(pollRepository.findAll());
+    // @GetMapping
+    // public ResponseEntity<List<Poll>> list() {
+    // return ResponseEntity.ok(pollRepository.findAll());
+    // }
+
+    @GetMapping()
+    public ResponseEntity<Page<ListPollOutput>> list(Pageable pageable) {
+        ListPollUseCase listPollUseCase = new ListPollPageable(pollRepository);
+        return ResponseEntity.ok(listPollUseCase.execute(pageable));
     }
 
     @GetMapping("/{pollId}")

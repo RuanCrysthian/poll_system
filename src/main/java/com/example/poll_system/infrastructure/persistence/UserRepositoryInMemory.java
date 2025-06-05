@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.User;
@@ -64,6 +66,12 @@ public class UserRepositoryInMemory implements UserRepository {
         return users.stream()
                 .filter(user -> user.getCpf().getCpf().equals(cpf))
                 .findFirst();
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
     }
 
 }

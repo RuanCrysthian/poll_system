@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Vote;
@@ -34,6 +37,19 @@ public class VoteRepositoryInMemory implements VoteRepository {
     @Override
     public List<Vote> findAll() {
         return votes;
+    }
+
+    @Override
+    public Page<Vote> findAll(Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), votes.size());
+
+        if (start >= votes.size()) {
+            return new PageImpl<>(new ArrayList<>(), pageable, votes.size());
+        }
+
+        List<Vote> pageContent = votes.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, votes.size());
     }
 
     @Override

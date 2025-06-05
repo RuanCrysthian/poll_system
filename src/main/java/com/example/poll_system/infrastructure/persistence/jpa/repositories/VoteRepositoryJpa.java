@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.example.poll_system.domain.entities.Vote;
@@ -43,6 +45,12 @@ public class VoteRepositoryJpa implements VoteRepository {
         return entities.stream()
                 .map(voteMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Vote> findAll(Pageable pageable) {
+        Page<VoteEntity> entitiesPage = jpaRepository.findAll(pageable);
+        return entitiesPage.map(voteMapper::toDomain);
     }
 
     @Override

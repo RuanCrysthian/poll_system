@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.example.poll_system.domain.entities.Vote;
 
 public interface VoteRepository {
@@ -12,6 +15,8 @@ public interface VoteRepository {
     Optional<Vote> findById(String id);
 
     List<Vote> findAll();
+
+    Page<Vote> findAll(Pageable pageable);
 
     void delete(String id);
 
