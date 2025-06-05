@@ -26,6 +26,8 @@ The Poll System is an application that enables users to participate in polls thr
 - **Role-based Access**: Support for Admin and Voter roles
 - **Profile Management**: Upload and manage user profile images via MinIO object storage
 - **Input Validation**: CPF and email uniqueness validation
+- **JWT Authentication**: Secure authentication system with JSON Web Tokens
+- **Role-based Authorization**: Endpoints protected based on user roles
 
 ### Poll Management
 - **Poll Creation**: Create polls with multiple options (2-10 options supported)
@@ -88,6 +90,7 @@ src/main/java/com/example/poll_system/
 
 #### Use Cases
 - [`CreateUser`](src/main/java/com/example/poll_system/application/usecases/user/CreateUser.java) - User registration with image upload
+- [`Login`](src/main/java/com/example/poll_system/application/usecases/auth/Login.java) - User authentication with JWT token generation
 - [`CreatePoll`](src/main/java/com/example/poll_system/application/usecases/poll/CreatePoll.java) - Poll creation with validation and scheduling
 - [`ActivePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ActivePoll.java) - Manual poll activation from SCHEDULED to OPEN status
 - [`ClosePoll`](src/main/java/com/example/poll_system/application/usecases/poll/ClosePoll.java) - Manual poll closing from OPEN to CLOSED status
@@ -97,12 +100,13 @@ src/main/java/com/example/poll_system/
 - [`SendEmailVoteProcessed`](src/main/java/com/example/poll_system/application/usecases/vote/impl/SendEmailVoteProcessed.java) - Email notification service
 
 #### Controllers
+- [`AuthController`](src/main/java/com/example/poll_system/infrastructure/controllers/AuthController.java) - Authentication endpoints
 - [`UserController`](src/main/java/com/example/poll_system/infrastructure/controllers/UserController.java) - User management endpoints
 - [`PollController`](src/main/java/com/example/poll_system/infrastructure/controllers/PollController.java) - Poll management endpoints
 - [`VoteController`](src/main/java/com/example/poll_system/infrastructure/controllers/VoteController.java) - Voting endpoints
 
 #### Schedulers
-- [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java) - Automatic poll activation service
+- [`PollScheduler`](src/main/java/com/example/poll_system/infrastructure/services/schedulers/PollScheduler.java) - Automatic poll activation and deactivation service
 
 #### Event Listeners
 - [`CreateVoteListener`](src/main/java/com/example/poll_system/infrastructure/services/listeners/CreateVoteListener.java) - Processes vote creation events
@@ -115,7 +119,9 @@ src/main/java/com/example/poll_system/
 - **Message Queue**: RabbitMQ for asynchronous processing
 - **Object Storage**: MinIO for profile image storage
 - **Email**: Spring Mail with MailHog for development
-- **Security**: Spring Security with BCrypt password hashing
+- **Security**: Spring Security with BCrypt password hashing and JWT authentication
+- **Authentication**: JSON Web Tokens (JWT) for stateless authentication
+- **Authorization**: Role-based access control (RBAC)
 - **Testing**: JUnit 5, Mockito for comprehensive unit testing
 - **Build Tool**: Maven with Surefire for test execution
 - **Scheduling**: Spring `@Scheduled` for poll automation
@@ -163,18 +169,21 @@ After running `docker-compose up -d`, the following services will be available:
 
 ## 📡 API Endpoints
 
+### Authentication
+- `POST /api/v1/auth/login` - Authenticate user and get JWT token
+
 ### Users
 - `POST /api/v1/users` - Create a new user with profile image
-- `GET /api/v1/users` - List all users
+- `GET /api/v1/users` - List all users (requires authentication)
 
 ### Polls
-- `POST /api/v1/polls` - Create a new poll with options and scheduling
-- `GET /api/v1/polls` - List all polls
-- `GET /api/v1/polls/{pollId}/statistics` - Get comprehensive poll statistics including vote counts and totals
+- `POST /api/v1/polls` - Create a new poll with options and scheduling (requires authentication)
+- `GET /api/v1/polls` - List all polls (requires authentication)
+- `GET /api/v1/polls/{pollId}/statistics` - Get comprehensive poll statistics including vote counts and totals (requires authentication)
 
 ### Votes
-- `POST /api/v1/votes` - Submit a vote (asynchronous processing)
-- `GET /api/v1/votes` - List all votes
+- `POST /api/v1/votes` - Submit a vote (asynchronous processing, requires authentication)
+- `GET /api/v1/votes` - List all votes (requires authentication)
 
 ## ⚙️ Configuration
 
@@ -198,6 +207,10 @@ spring.mail.port=1025
 # Retry Configuration
 spring.rabbitmq.listener.simple.retry.enabled=true
 spring.rabbitmq.listener.simple.retry.max-attempts=5
+
+# JWT Authentication
+app.jwt.secret=mySecretKey123456789012345678901234567890abcdefghijklmnopqrstuvwxyz
+app.jwt.expiration=86400
 ```
 
 ## ⏰ Automated Scheduling
