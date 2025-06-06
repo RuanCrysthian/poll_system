@@ -43,7 +43,6 @@ public class PollScheduler {
             if (!poll.getStartDate().isAfter(now)) {
                 activePoll.execute(new ActivePollInput(poll.getId()));
                 sendInfoLogMessageActivatingPoll(poll);
-                System.out.println("Activated poll: " + poll.getId() + " at " + now);
             }
         }
     }
