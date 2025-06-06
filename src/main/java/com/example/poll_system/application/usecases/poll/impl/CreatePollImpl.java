@@ -3,6 +3,8 @@ package com.example.poll_system.application.usecases.poll.impl;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class CreatePollImpl implements CreatePoll {
         this.userRepository = userRepository;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(CreatePollImpl.class);
+
     @Override
     @Transactional
     public CreatePollOutput execute(CreatePollInput input) {
@@ -52,6 +56,7 @@ public class CreatePollImpl implements CreatePoll {
                 pollOptions);
         pollRepository.save(poll);
         pollOptionRepository.saveAll(pollOptions);
+        sendInfoLogMessagePollCreated(poll);
         return toOutput(poll);
     }
 
@@ -61,10 +66,22 @@ public class CreatePollImpl implements CreatePoll {
 
     private void validateOwner(String ownerId) {
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new BusinessRulesException("Owner not found."));
+                .orElseThrow(() -> {
+                    sendWarningLogMessageOwnerNotFound(ownerId);
+                    return new BusinessRulesException("Owner not found.");
+                });
         if (owner.isVoter()) {
             throw new BusinessRulesException("Owner must be an admin.");
         }
+    }
+
+    private void sendWarningLogMessageOwnerNotFound(String ownerId) {
+        logger.warn("Poll creation failed - Owner not found: {}", ownerId);
+    }
+
+    private void sendInfoLogMessagePollCreated(Poll poll) {
+        logger.info("Poll created - ID: {}, Title: {}, Owner ID: {}, Start Date: {}, End Date: {}",
+                poll.getId(), poll.getTitle(), poll.getOwnerId(), poll.getStartDate(), poll.getEndDate());
     }
 
     private CreatePollOutput toOutput(Poll poll) {

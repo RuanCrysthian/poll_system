@@ -1,5 +1,7 @@
 package com.example.poll_system.application.usecases.vote.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.poll_system.application.usecases.vote.CreateVote;
@@ -32,10 +34,13 @@ public class SendVoteToQueue implements CreateVote {
         this.eventPublisher = eventPublisher;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(SendVoteToQueue.class);
+
     public void execute(CreateVoteInput input) {
         validateInput(input);
         VoteCreatedEvent event = buildCreateVoteEvent(input);
         eventPublisher.publish(event);
+        sendInfoLogMessageSentToQueue(event);
     }
 
     private void validateInput(CreateVoteInput input) {
@@ -46,13 +51,25 @@ public class SendVoteToQueue implements CreateVote {
 
     private void validateIfUserExists(String userId) {
         if (!userRepository.findById(userId).isPresent()) {
+            sendWarningLogMessageUserNotFound(userId);
             throw new BusinessRulesException("User not found");
         }
     }
 
+    private void sendWarningLogMessageUserNotFound(String userId) {
+        logger.warn("Vote creation failed - User not found: {}", userId);
+    }
+
     private PollOption validateAndGetPollOption(String pollOptionId) {
         return pollOptionRepository.findById(pollOptionId)
-                .orElseThrow(() -> new BusinessRulesException("Poll option not found"));
+                .orElseThrow(() -> {
+                    sendWarningLogMessagePollOptionNotFound(pollOptionId);
+                    return new BusinessRulesException("Poll option not found");
+                });
+    }
+
+    private void sendWarningLogMessagePollOptionNotFound(String pollOptionId) {
+        logger.warn("Vote creation failed - Poll option not found: {}", pollOptionId);
     }
 
     private void validateIfPollIsOpen(PollOption pollOption) {
@@ -60,13 +77,23 @@ public class SendVoteToQueue implements CreateVote {
                 .orElseThrow(() -> new BusinessRulesException("Poll not found"));
 
         if (!poll.isOpen()) {
+            sendWarningLogMessagePollIsClosed(poll.getId());
             throw new BusinessRulesException("Poll is not open for voting");
         }
+    }
+
+    private void sendWarningLogMessagePollIsClosed(String pollId) {
+        logger.warn("Vote creation failed - Poll is closed for voting: {}", pollId);
     }
 
     private VoteCreatedEvent buildCreateVoteEvent(CreateVoteInput input) {
         return new VoteCreatedEvent(
                 input.userId(),
                 input.pollOptionId());
+    }
+
+    private void sendInfoLogMessageSentToQueue(VoteCreatedEvent event) {
+        logger.info("Vote sent to queue - userId: {}, pollOptionId: {}", event.getUserId(),
+                event.getPollOptionId());
     }
 }

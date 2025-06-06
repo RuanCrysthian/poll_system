@@ -1,5 +1,7 @@
 package com.example.poll_system.application.usecases.poll.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.poll_system.application.usecases.poll.ActivePoll;
@@ -19,13 +21,27 @@ public class ActivePollImpl implements ActivePoll {
         this.pollRepository = pollRepository;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(ActivePollImpl.class);
+
     @Override
     public ActivePollOutput execute(ActivePollInput input) {
         Poll pollToActivate = pollRepository.findById(input.pollId())
-                .orElseThrow(() -> new EntityNotFoundException("Poll not found"));
+                .orElseThrow(() -> {
+                    sendWarningLogMessagePollNotFound(input.pollId());
+                    return new EntityNotFoundException("Poll not found");
+                });
         pollToActivate.open();
         pollRepository.update(pollToActivate);
+        sendInfoLogMessagePollActivated(pollToActivate);
         return toOutput(pollToActivate);
+    }
+
+    private void sendWarningLogMessagePollNotFound(String pollId) {
+        logger.warn("Poll activation failed - Poll not found: {}", pollId);
+    }
+
+    private void sendInfoLogMessagePollActivated(Poll poll) {
+        logger.info("Poll activated successfully - Poll ID: {}, Title: {}", poll.getId(), poll.getTitle());
     }
 
     private ActivePollOutput toOutput(Poll poll) {

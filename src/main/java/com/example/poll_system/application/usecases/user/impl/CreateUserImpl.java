@@ -2,6 +2,8 @@ package com.example.poll_system.application.usecases.user.impl;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.poll_system.application.usecases.user.CreateUser;
@@ -29,10 +31,13 @@ public class CreateUserImpl implements CreateUser {
         this.objectStorageService = objectStorageService;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(CreateUserImpl.class);
+
     public CreateUserOutput execute(CreateUserInput input) {
         validateInput(input);
         User user = buildUser(input);
         userRepository.save(user);
+        sendInfoLogMessageUserCreated(user);
         return toOutput(user);
     }
 
@@ -43,14 +48,24 @@ public class CreateUserImpl implements CreateUser {
 
     private void validateIfEmployeeExistsByCpf(String cpf) {
         if (userRepository.findByCpf(cpf).isPresent()) {
+            sendWarningLogMessageUserAlreadyExistsByCpf(cpf);
             throw new BusinessRulesException("User with this CPF already exists");
         }
     }
 
+    private void sendWarningLogMessageUserAlreadyExistsByCpf(String cpf) {
+        logger.warn("User creation failed - CPF already exists: {}", cpf);
+    }
+
     private void validateIfEmployeeExistsByEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
+            sendWarningLogMessageUserAlreadyExistsByEmail(email);
             throw new BusinessRulesException("User with this email already exists");
         }
+    }
+
+    private void sendWarningLogMessageUserAlreadyExistsByEmail(String email) {
+        logger.warn("User creation failed - Email already exists: {}", email);
     }
 
     private User buildUser(CreateUserInput input) {
@@ -70,8 +85,14 @@ public class CreateUserImpl implements CreateUser {
             String fileName = UUID.randomUUID().toString();
             return objectStorageService.upload(fileName, input.imageProfile().getInputStream());
         } catch (Exception e) {
+            logger.error("Failed to upload user profile image - userId: {}, error: {}", input.name(), e.getMessage());
             throw new BusinessRulesException("Error uploading image profile " + e.getMessage());
         }
+    }
+
+    private void sendInfoLogMessageUserCreated(User user) {
+        logger.info("User created successfully - userId: {}, email: {}, role: {}",
+                user.getId(), user.getEmail().getEmail(), user.getRole().name());
     }
 
     private CreateUserOutput toOutput(User user) {

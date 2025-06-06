@@ -1,5 +1,7 @@
 package com.example.poll_system.infrastructure.services.listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ public class SendEmailVoteProcessedListener {
         this.sendEmailVoteProcessed = sendEmailToUserUseCase;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(SendEmailVoteProcessedListener.class);
+
     @RabbitListener(queues = "${app.rabbitmq.email-queue}")
     public void listen(VoteProcessedEvent event) {
         try {
@@ -27,9 +31,15 @@ public class SendEmailVoteProcessedListener {
                     SUBJECT,
                     BODY);
             sendEmailVoteProcessed.execute(input);
+            sendInfoLogMessageEmailSent(event);
         } catch (Exception e) {
+            logger.error("Failed to send email for vote processed event: {}", e.getMessage());
             throw new FailedToSendMessageToQueueException("Erro ao enviar email");
         }
+    }
+
+    private void sendInfoLogMessageEmailSent(VoteProcessedEvent event) {
+        logger.info("Email Vote Processed sent to user: {} at {}", event.getUserEmail(), event.getOccurredAt());
     }
 
 }

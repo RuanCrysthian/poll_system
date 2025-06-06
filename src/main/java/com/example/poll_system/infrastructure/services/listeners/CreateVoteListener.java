@@ -1,5 +1,7 @@
 package com.example.poll_system.infrastructure.services.listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -16,18 +18,21 @@ public class CreateVoteListener {
         this.processVote = processVote;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(CreateVoteListener.class);
+
     @RabbitListener(queues = "${app.rabbitmq.vote-queue}")
     public void listen(VoteCreatedEvent message) {
         try {
-            System.out.println("VoteQueueListener: recebida mensagem -> " + message.getUserId() + ", "
-                    + message.getPollOptionId());
-
             ProcessVoteInput input = new ProcessVoteInput(message.getUserId(), message.getPollOptionId());
             processVote.execute(input);
-
+            sendInfoLogMessageVoteProcessed(message);
         } catch (Exception e) {
             System.err.println("Erro ao processar voto: " + e.getMessage());
             throw e;
         }
+    }
+
+    private void sendInfoLogMessageVoteProcessed(VoteCreatedEvent message) {
+        logger.info("Vote processed for user: {}", message.getUserId());
     }
 }

@@ -1,5 +1,9 @@
 package com.example.poll_system.application.usecases.vote.impl;
 
+import java.time.LocalDateTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.poll_system.application.usecases.vote.ProcessVote;
@@ -36,6 +40,8 @@ public class ProcessVoteImpl implements ProcessVote {
         this.eventPublisher = eventPublisher;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(ProcessVoteImpl.class);
+
     @Override
     public ProcessVoteOutput execute(ProcessVoteInput input) {
         PollOption pollOption = pollOptionRepository.findById(input.pollOptionId())
@@ -45,12 +51,31 @@ public class ProcessVoteImpl implements ProcessVote {
         voteRepository.save(vote);
         User user = getValidatedUser(vote.getUserId());
         eventPublisher.publish(new VoteProcessedEvent(user.getId(), user.getEmail().getEmail(), vote.getCreatedAt()));
+        sendInfoLogMessageVoteProcessedEmailSent(user.getEmail().getEmail(), vote.getCreatedAt());
+        sendInforLogMessageVoteProcessed(vote);
         return toOutput(vote);
+    }
+
+    private void sendInfoLogMessageVoteProcessedEmailSent(String email, LocalDateTime createdAt) {
+        logger.info("Vote processed - Email sent to: {} at {}", email, createdAt);
+    }
+
+    private void sendInforLogMessageVoteProcessed(Vote vote) {
+        logger.info(
+                "Vote processed - Vote ID: {}, User ID: {}, Poll Option ID: {}, Poll ID: {}, Created At: {}",
+                vote.getId(), vote.getUserId(), vote.getPollOptionId(), vote.getPollId(), vote.getCreatedAt());
     }
 
     private User getValidatedUser(String userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    sendWarningLogMessageUserNotFound(userId);
+                    return new EntityNotFoundException("User not found");
+                });
+    }
+
+    private void sendWarningLogMessageUserNotFound(String userId) {
+        logger.warn("Vote processing failed - User not found: {}", userId);
     }
 
     private ProcessVoteOutput toOutput(Vote vote) {

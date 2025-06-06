@@ -3,6 +3,8 @@ package com.example.poll_system.infrastructure.services.schedulers;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,16 +30,19 @@ public class PollScheduler {
         this.closePoll = closePoll;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(PollScheduler.class);
+
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void open() {
-        System.out.println("Executing PollScheduler at " + LocalDateTime.now());
+        sendInfoLogMessageExecutingPollScheduler();
         List<Poll> scheduledPolls = pollRepository.findByStatus(PollStatus.SCHEDULED);
         LocalDateTime now = LocalDateTime.now();
 
         for (Poll poll : scheduledPolls) {
             if (!poll.getStartDate().isAfter(now)) {
                 activePoll.execute(new ActivePollInput(poll.getId()));
+                sendInfoLogMessageActivatingPoll(poll);
                 System.out.println("Activated poll: " + poll.getId() + " at " + now);
             }
         }
@@ -46,16 +51,29 @@ public class PollScheduler {
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void close() {
-        System.out.println("Executing PollScheduler at " + LocalDateTime.now());
+        sendInfoLogMessageExecutingPollScheduler();
         List<Poll> activePolls = pollRepository.findByStatus(PollStatus.OPEN);
         LocalDateTime now = LocalDateTime.now();
 
         for (Poll poll : activePolls) {
             if (!poll.getEndDate().isAfter(now)) {
                 closePoll.execute(new ClosePollInput(poll.getId()));
-                System.out.println("Closed poll: " + poll.getId() + " at " + now);
+                sendInfoLogMessageClosingPoll(poll);
             }
         }
+    }
+
+    private void sendInfoLogMessageExecutingPollScheduler() {
+        logger.info("Executing PollScheduler at {}.", LocalDateTime.now());
+    }
+
+    private void sendInfoLogMessageActivatingPoll(Poll poll) {
+        logger.info("Activating poll: pollId={} at {}",
+                poll.getId(), LocalDateTime.now());
+    }
+
+    private void sendInfoLogMessageClosingPoll(Poll poll) {
+        logger.info("Closing poll: pollId={} at {}", poll.getId(), LocalDateTime.now());
     }
 
 }

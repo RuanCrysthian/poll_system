@@ -1,5 +1,7 @@
 package com.example.poll_system.infrastructure.services.listeners;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,9 @@ public class SendEmailPollClosedListener {
         this.pollStatistics = pollStatistics;
     }
 
+    private static final String SUBJECT = "📊 Resultados da sua Enquete - Fechamento Automático";
+    private final Logger logger = LoggerFactory.getLogger(SendEmailPollClosedListener.class);
+
     @RabbitListener(queues = "${app.rabbitmq.email-poll-close.queue}")
     @Transactional(readOnly = true)
     public void listenPollClosedEvent(PollClosedEvent event) {
@@ -30,13 +35,13 @@ public class SendEmailPollClosedListener {
             String emailBody = buildPollClosedEmailBody(event.getPollId());
             SendEmailInput input = new SendEmailInput(
                     event.getOwnerEmail(),
-                    "📊 Resultados da sua Enquete - Fechamento Automático",
+                    SUBJECT,
                     emailBody);
             sendEmailVoteProcessed.execute(input);
-
+            sendInfoLogMessageEmailSent(event);
         } catch (Exception e) {
             throw new FailedToSendMessageToQueueException(
-                    "Erro ao enviar email de fechamento de enquete: " + e.getMessage());
+                    "Failed to Send Message PollClosedEvent" + e.getMessage());
         }
     }
 
@@ -94,5 +99,9 @@ public class SendEmailPollClosedListener {
             case 2 -> "🥉";
             default -> "🔸";
         };
+    }
+
+    private void sendInfoLogMessageEmailSent(PollClosedEvent event) {
+        logger.info("Email Poll Closed sent to user: {} at {}", event.getOwnerEmail(), event.getOccurredAt());
     }
 }

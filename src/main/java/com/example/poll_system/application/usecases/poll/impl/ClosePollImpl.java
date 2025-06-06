@@ -1,5 +1,7 @@
 package com.example.poll_system.application.usecases.poll.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.poll_system.application.usecases.poll.ClosePoll;
@@ -33,6 +35,8 @@ public class ClosePollImpl implements ClosePoll {
         this.eventPublisher = eventPublisher;
     }
 
+    private final Logger logger = LoggerFactory.getLogger(ClosePollImpl.class);
+
     @Override
     public ClosePollOutput execute(ClosePollInput input) {
         Poll pollToClose = findPollById(input.pollId());
@@ -40,22 +44,43 @@ public class ClosePollImpl implements ClosePoll {
         pollRepository.update(pollToClose);
         User owner = findOwnerById(pollToClose.getOwnerId());
         publishPollClosedEvent(pollToClose, owner);
+        sendInfoMessagePollClosed(pollToClose);
         return toOutput(pollToClose);
     }
 
     private Poll findPollById(String pollId) {
         return pollRepository.findById(pollId)
-                .orElseThrow(() -> new EntityNotFoundException(POLL_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> {
+                    sendWarningLogMessagePollNotFound(pollId);
+                    return new EntityNotFoundException(POLL_NOT_FOUND_MESSAGE);
+                });
     }
 
     private User findOwnerById(String ownerId) {
         return userRepository.findById(ownerId)
-                .orElseThrow(() -> new EntityNotFoundException(POLL_OWNER_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> {
+                    sendWarningLogMessagePollOwnerNotFound(ownerId);
+                    return new EntityNotFoundException(POLL_OWNER_NOT_FOUND_MESSAGE);
+                });
+    }
+
+    private void sendWarningLogMessagePollNotFound(String pollId) {
+        logger.warn("Poll closing failed - Poll not found: {}", pollId);
+    }
+
+    private void sendWarningLogMessagePollOwnerNotFound(String ownerId) {
+        logger.warn("Poll closing failed - Poll owner not found: {}", ownerId);
     }
 
     private void publishPollClosedEvent(Poll poll, User owner) {
         PollClosedEvent event = createPollClosedEvent(poll, owner);
         eventPublisher.publish(event);
+        sendInfoLogMessagePollClosedEvent(event);
+    }
+
+    private void sendInfoLogMessagePollClosedEvent(PollClosedEvent event) {
+        logger.info("Poll closed event published - Poll ID: {}, Owner Email: {}, Title: {}",
+                event.getPollId(), event.getOwnerEmail(), event.getPollTitle());
     }
 
     private PollClosedEvent createPollClosedEvent(Poll poll, User owner) {
@@ -66,6 +91,10 @@ public class ClosePollImpl implements ClosePoll {
                 poll.getTitle(),
                 poll.getDescription(),
                 poll.getEndDate());
+    }
+
+    private void sendInfoMessagePollClosed(Poll poll) {
+        logger.info("Poll closed successfully - Poll ID: {}, Title: {}", poll.getId(), poll.getTitle());
     }
 
     private ClosePollOutput toOutput(Poll poll) {
