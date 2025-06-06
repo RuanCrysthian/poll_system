@@ -24,7 +24,6 @@ public class MailSenderImpl implements MailSender {
         message.setFrom("noreply@poll-system.com");
 
         javaMailSender.send(message);
-        System.out.println("SmtpMailSender: Email enviado para " + to);
     }
 
 }

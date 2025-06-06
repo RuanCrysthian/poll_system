@@ -16,6 +16,8 @@ import com.example.poll_system.domain.entities.User;
 import com.example.poll_system.domain.gateways.JwtTokenGateway;
 import com.example.poll_system.domain.gateways.UserRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,27 +50,68 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        userEmail = jwtTokenGateway.extractEmailFromToken(jwt);
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        try {
+            userEmail = jwtTokenGateway.extractEmailFromToken(jwt);
 
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
-                if (jwtTokenGateway.isTokenValid(jwt, userEmail) && user.isActive()) {
-                    List<SimpleGrantedAuthority> authorities = List.of(
-                            new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+                if (userOptional.isPresent()) {
+                    User user = userOptional.get();
 
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            user.getEmail().getEmail(),
-                            null,
-                            authorities);
+                    if (jwtTokenGateway.isTokenValid(jwt, userEmail) && user.isActive()) {
+                        List<SimpleGrantedAuthority> authorities = List.of(
+                                new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                user.getEmail().getEmail(),
+                                null,
+                                authorities);
+
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+        } catch (ExpiredJwtException ex) {
+            // Token expirado - não autentica o usuário, mas permite que a requisição
+            // continue
+            // A resposta de erro será tratada pelos endpoints protegidos ou pelo
+            // GlobalExceptionHandler
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("""
+                    {
+                        "status": 401,
+                        "error": "Token Expired",
+                        "message": "JWT token has expired. Please login again.",
+                        "timestamp": "%s",
+                        "path": "%s"
+                    }
+                    """.formatted(java.time.LocalDateTime.now(), request.getRequestURI()));
+            return;
+        } catch (JwtException ex) {
+            // Token inválido - não autentica o usuário, mas permite que a requisição
+            // continue
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("""
+                    {
+                        "status": 401,
+                        "error": "Invalid Token",
+                        "message": "JWT token is invalid. Please login again.",
+                        "timestamp": "%s",
+                        "path": "%s"
+                    }
+                    """.formatted(java.time.LocalDateTime.now(), request.getRequestURI()));
+            return;
+        } catch (Exception ex) {
+            // Qualquer outra exceção relacionada ao JWT - não autentica o usuário
+            // Log do erro para debugging
+            System.err.println("JWT processing error: " + ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
