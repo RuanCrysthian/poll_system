@@ -83,7 +83,7 @@ public class SendVoteToQueue implements CreateVote {
     }
 
     private void sendWarningLogMessagePollIsClosed(String pollId) {
-        logger.warn("Vote creation failed - Poll is closed for voting: {}", pollId);
+        logger.warn("Vote creation failed - Poll is closed for voting: pollId = {}", pollId);
     }
 
     private VoteCreatedEvent buildCreateVoteEvent(CreateVoteInput input) {
