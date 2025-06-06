@@ -15,6 +15,17 @@ import com.example.poll_system.domain.value_objects.Email;
 
 public class UserTest {
 
+    private User createUserAdmin() {
+        String id = "1";
+        String name = "John Doe";
+        Cpf cpf = new Cpf("74571762097");
+        Email email = new Email("jane.doe@email.com");
+        String password = "password123";
+        String urlImageProfile = "http://example.com/image.jpg";
+
+        return User.createAdmin(id, name, cpf, email, password, urlImageProfile);
+    }
+
     @Test
     void shouldCreateAdminUser() {
         String id = "1";
@@ -332,6 +343,110 @@ public class UserTest {
         assertEquals(urlImageProfile, user.getUrlImageProfile());
         assertTrue(user.isVoter());
         assertFalse(user.isAdmin());
+    }
+
+    @Test
+    void shouldActivateUser() {
+        String id = "1";
+        String name = "John Doe";
+        Cpf cpf = new Cpf("74571762097");
+        Email email = new Email("jane.doe@email.com");
+        String password = "password123";
+        String urlImageProfile = "http://example.com/image.jpg";
+
+        User user = User.createAdmin(id, name, cpf, email, password, urlImageProfile);
+        user.deactivate();
+        assertFalse(user.isActive());
+        user.activate();
+        assertTrue(user.isActive());
+    }
+
+    @Test
+    void shouldChangeName() {
+        User user = createUserAdmin();
+        String newName = "New Name";
+        user.changeName(newName);
+        assertEquals(newName, user.getName());
+    }
+
+    @Test
+    void shouldNotChangeNameWhenNameIsNull() {
+        User user = createUserAdmin();
+        user.changeName(null);
+        assertEquals(user.getName(), user.getName());
+    }
+
+    @Test
+    void shouldNotChangeNameWhenNameIsEmpty() {
+        User user = createUserAdmin();
+        user.changeName(" ");
+        assertEquals(user.getName(), user.getName());
+    }
+
+    @Test
+    void shouldChangeUrlImageProfile() {
+        User user = createUserAdmin();
+        String newUrlImageProfile = "http://example.com/new_image.jpg";
+        user.changeUrlImageProfile(newUrlImageProfile);
+        assertEquals(newUrlImageProfile, user.getUrlImageProfile());
+    }
+
+    @Test
+    void shouldNotChangeUrlImageProfileWhenUrlIsNull() {
+        User user = createUserAdmin();
+        user.changeUrlImageProfile(null);
+        assertEquals(user.getUrlImageProfile(), user.getUrlImageProfile());
+    }
+
+    @Test
+    void shouldNotChangeUrlImageProfileWhenUrlIsEmpty() {
+        User user = createUserAdmin();
+        user.changeUrlImageProfile(" ");
+        assertEquals(user.getUrlImageProfile(), user.getUrlImageProfile());
+    }
+
+    @Test
+    void shouldChangeCpf() {
+        User user = createUserAdmin();
+        Cpf newCpf = new Cpf("78887276030");
+        user.changeCpf(newCpf);
+        assertEquals(newCpf, user.getCpf());
+    }
+
+    @Test
+    void shouldNotChangeCpfWhenCpfIsNull() {
+        User user = createUserAdmin();
+        user.changeCpf(null);
+        assertEquals(user.getCpf(), user.getCpf());
+    }
+
+    @Test
+    void shouldChangeEmail() {
+        User user = createUserAdmin();
+        Email newEmail = new Email("newemail@email.com");
+        user.changeEmail(newEmail);
+        assertEquals(newEmail, user.getEmail());
+    }
+
+    @Test
+    void shouldNotChangeEmailWhenEmailIsNull() {
+        User user = createUserAdmin();
+        user.changeEmail(null);
+        assertEquals(user.getEmail(), user.getEmail());
+    }
+
+    @Test
+    void shouldChangeRole() {
+        User user = createUserAdmin();
+        user.changeRole(UserRole.VOTER);
+        assertEquals(UserRole.VOTER, user.getRole());
+    }
+
+    @Test
+    void shouldNotChangeRoleWhenRoleIsNull() {
+        User user = createUserAdmin();
+        user.changeRole(null);
+        assertEquals(UserRole.ADMIN, user.getRole());
     }
 
 }

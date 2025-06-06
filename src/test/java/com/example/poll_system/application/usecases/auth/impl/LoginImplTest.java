@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -205,7 +204,7 @@ class LoginImplTest {
 
         // Create an inactive user by reflection (since we can't directly set isActive
         // to false)
-        User user = User.createVoter(
+        User inactiveUser = User.createVoter(
                 "1",
                 "John Doe",
                 new Cpf("74571762097"),
@@ -216,10 +215,7 @@ class LoginImplTest {
         // We need to create an inactive user differently since the factory always
         // creates active users
         // For this test, we'll mock the behavior instead
-        User inactiveUser = mock(User.class);
-        when(inactiveUser.getEmail()).thenReturn(new Email(email));
-        when(inactiveUser.getPassword()).thenReturn(encodedPassword);
-        when(inactiveUser.isActive()).thenReturn(false);
+        inactiveUser.deactivate();
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(inactiveUser));
         when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);

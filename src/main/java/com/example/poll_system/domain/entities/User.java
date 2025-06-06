@@ -100,6 +100,14 @@ public class User {
         return isActive;
     }
 
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
     public String getUrlImageProfile() {
         return urlImageProfile;
     }
@@ -112,4 +120,43 @@ public class User {
         return UserRole.ADMIN.equals(role);
     }
 
+    public void changeName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return;
+        }
+        this.name = name;
+        validate();
+    }
+
+    public void changeCpf(Cpf cpf) {
+        if (cpf == null) {
+            return;
+        }
+        this.cpf = cpf;
+        validate();
+    }
+
+    public void changeEmail(Email email) {
+        if (email == null) {
+            return;
+        }
+        this.email = email;
+        validate();
+    }
+
+    public void changeUrlImageProfile(String urlImageProfile) {
+        if (urlImageProfile == null || urlImageProfile.trim().isEmpty()) {
+            return;
+        }
+        this.urlImageProfile = urlImageProfile;
+        validate();
+    }
+
+    public void changeRole(UserRole role) {
+        if (role == null) {
+            return;
+        }
+        this.role = role;
+        validate();
+    }
 }
