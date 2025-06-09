@@ -15,7 +15,7 @@ import com.example.poll_system.domain.value_objects.Cpf;
 import com.example.poll_system.domain.value_objects.Email;
 
 @Repository
-@Profile("!jpa")
+@Profile("in-memory")
 public class UserRepositoryInMemory implements UserRepository {
     private final List<User> users = new ArrayList<>();
 

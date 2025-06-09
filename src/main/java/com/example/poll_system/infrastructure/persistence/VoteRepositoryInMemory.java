@@ -17,7 +17,7 @@ import com.example.poll_system.domain.enums.VoteStatus;
 import com.example.poll_system.domain.gateways.VoteRepository;
 
 @Repository
-@Profile("!jpa")
+@Profile("in-memory")
 public class VoteRepositoryInMemory implements VoteRepository {
 
     private final List<Vote> votes = new ArrayList<>();

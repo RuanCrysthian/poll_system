@@ -11,7 +11,7 @@ import com.example.poll_system.domain.entities.PollOption;
 import com.example.poll_system.domain.gateways.PollOptionRepository;
 
 @Repository
-@Profile("!jpa")
+@Profile("in-memory")
 public class PollOptionRepositoryInMemory implements PollOptionRepository {
 
     private final List<PollOption> pollOptions = new ArrayList<>();

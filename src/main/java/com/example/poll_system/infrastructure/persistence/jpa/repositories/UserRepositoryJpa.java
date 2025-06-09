@@ -16,7 +16,7 @@ import com.example.poll_system.infrastructure.persistence.jpa.entities.UserEntit
 import com.example.poll_system.infrastructure.persistence.jpa.mappers.UserMapper;
 
 @Repository
-@Profile("jpa")
+@Profile("jpa-")
 public class UserRepositoryJpa implements UserRepository {
 
     @Autowired

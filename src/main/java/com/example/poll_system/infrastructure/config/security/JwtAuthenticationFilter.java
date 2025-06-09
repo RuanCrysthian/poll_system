@@ -77,8 +77,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException ex) {
             // Token expirado - não autentica o usuário, mas permite que a requisição
             // continue
-            // A resposta de erro será tratada pelos endpoints protegidos ou pelo
-            // GlobalExceptionHandler
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -109,8 +107,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     """.formatted(java.time.LocalDateTime.now(), request.getRequestURI()));
             return;
         } catch (Exception ex) {
-            // Qualquer outra exceção relacionada ao JWT - não autentica o usuário
-            // Log do erro para debugging
             System.err.println("JWT processing error: " + ex.getMessage());
         }
 

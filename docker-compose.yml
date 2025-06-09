@@ -51,8 +51,26 @@ services:
       - postgresql_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379" # Porta padrão do Redis
+    command: redis-server --appendonly yes --requirepass redis_password
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=redis_password
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   minio_data: # Define o volume nomeado
   rabbitmq_data: # Define o volume nomeado para o RabbitMQ
   mailhog_data: # Define o volume nomeado para o MailHog
   postgresql_data: # Define o volume nomeado para o PostgreSQL
+  redis_data: # Define o volume nomeado para o Redis

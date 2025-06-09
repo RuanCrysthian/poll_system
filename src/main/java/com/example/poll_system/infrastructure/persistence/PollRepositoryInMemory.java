@@ -16,7 +16,7 @@ import com.example.poll_system.domain.exceptions.EntityNotFoundException;
 import com.example.poll_system.domain.gateways.PollRepository;
 
 @Repository
-@Profile("!jpa")
+@Profile("in-memory")
 public class PollRepositoryInMemory implements PollRepository {
 
     private final List<Poll> polls = new ArrayList<>();
