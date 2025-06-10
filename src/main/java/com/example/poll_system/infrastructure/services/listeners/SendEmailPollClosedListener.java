@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.poll_system.application.usecases.poll.PollStatistics;
+import com.example.poll_system.application.usecases.poll.dto.PollStatisticsInput;
+import com.example.poll_system.application.usecases.poll.dto.PollStatisticsOutput;
 import com.example.poll_system.application.usecases.user.SendEmailUseCase;
 import com.example.poll_system.application.usecases.vote.dto.SendEmailInput;
 import com.example.poll_system.domain.entities.events.PollClosedEvent;
@@ -47,8 +49,8 @@ public class SendEmailPollClosedListener {
 
     private String buildPollClosedEmailBody(String pollId) {
         try {
-            var statisticsInput = new com.example.poll_system.application.usecases.poll.dto.PollStatisticsInput(pollId);
-            var statistics = pollStatistics.getPollStatistics(statisticsInput);
+            PollStatisticsInput statisticsInput = new PollStatisticsInput(pollId);
+            PollStatisticsOutput statistics = pollStatistics.getPollStatistics(statisticsInput);
 
             StringBuilder body = new StringBuilder();
             body.append("🎉 Sua enquete foi finalizada com sucesso!\n\n");
