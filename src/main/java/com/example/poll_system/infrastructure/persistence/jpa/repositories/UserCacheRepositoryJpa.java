@@ -167,7 +167,6 @@ public class UserCacheRepositoryJpa implements UserRepository {
 
     @Override
     public Page<User> findAll(Pageable pageable) {
-        // Paginação geralmente não é cacheada por ser muito específica
         Page<UserEntity> entitiesPage = jpaRepository.findAll(pageable);
         return entitiesPage.map(userMapper::toDomain);
     }
