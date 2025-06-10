@@ -22,9 +22,6 @@ public class SendVoteQueueHandler implements DomainEventHandler<VoteCreatedEvent
     @Override
     public void handle(VoteCreatedEvent event) {
         messageQueueGateway.send(EXCHANGE_NAME, event, ROUTING_KEY);
-        System.out.println(
-                "SendVoteQueueHandler: VoteCreatedEvent enviado para a fila de mensageria. voteId: " + event.getUserId()
-                        + ", pollOptionId: " + event.getPollOptionId());
     }
 
 }

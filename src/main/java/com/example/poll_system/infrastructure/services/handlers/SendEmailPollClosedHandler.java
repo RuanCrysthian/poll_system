@@ -24,9 +24,6 @@ public class SendEmailPollClosedHandler implements DomainEventHandler<PollClosed
 
     @Override
     public void handle(PollClosedEvent event) {
-        System.out.println("SendEmailPollClosedHandler: Enviando email para o usuário "
-                + event.getOwnerPollId() + " com o email " + event.getOwnerEmail()
-                + " informando que a enquete " + event.getPollId() + " foi fechada.");
         messageQueueGateway.send(exchangeName, event, emailRoutingKey);
     }
 

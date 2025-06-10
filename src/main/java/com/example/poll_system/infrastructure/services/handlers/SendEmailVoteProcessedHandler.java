@@ -21,9 +21,6 @@ public class SendEmailVoteProcessedHandler implements DomainEventHandler<VotePro
     @Override
     public void handle(VoteProcessedEvent event) {
         messageQueueGateway.send(EXCHANGE_NAME, event, ROUTING_KEY);
-        System.out.println("SendEmailVoteProcessedHandler: Enviando email para o usuário "
-                + event.getUserId() + " com o email " + event.getUserEmail()
-                + " informando que o voto foi processado.");
     }
 
 }
