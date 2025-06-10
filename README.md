@@ -162,20 +162,12 @@ src/main/java/com/example/poll_system/
    cd pool_system
    ```
 
-2. **Start infrastructure services**
+2. **Start application**
    ```bash
    docker-compose up -d
    ```
 
-3. **Build the application**
-   ```bash
-   ./mvnw clean install
-   ```
 
-4. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
 
 The application will be available at `http://localhost:8090`
 
@@ -219,14 +211,14 @@ Key configuration properties in [`application.properties`](src/main/resources/ap
 server.port=8090
 
 # RabbitMQ
-spring.rabbitmq.host=localhost
+spring.rabbitmq.host=rabbitmq
 spring.rabbitmq.port=5672
 app.rabbitmq.exchange=vote
 app.rabbitmq.vote-queue=vote-queue
 app.rabbitmq.email-queue=email-queue
 
 # Email (MailHog)
-spring.mail.host=localhost
+spring.mail.host=mailhog
 spring.mail.port=1025
 
 # Retry Configuration
