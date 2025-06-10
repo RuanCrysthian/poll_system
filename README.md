@@ -12,6 +12,7 @@ A robust polling system built with Spring Boot that allows users to create polls
 - [API Endpoints](#api-endpoints)
 - [Configuration](#configuration)
 - [Infrastructure](#infrastructure)
+- [Cache System](#cache-system)
 - [Testing](#testing)
 - [Contributing](#contributing)
 
@@ -133,6 +134,8 @@ src/main/java/com/example/poll_system/
 
 - **Framework**: Spring Boot 3.4.5 with `@EnableScheduling` for automated tasks
 - **Language**: Java 21
+- **Database**: PostgreSQL with JPA/Hibernate
+- **Cache**: Redis 7 with Cache-Aside pattern for performance optimization
 - **Message Queue**: RabbitMQ for asynchronous processing
 - **Object Storage**: MinIO for profile image storage
 - **Email**: Spring Mail with MailHog for development
@@ -183,6 +186,8 @@ After running `docker-compose up -d`, the following services will be available:
 - **RabbitMQ Management**: http://localhost:15672 (guest/guest)
 - **MinIO Console**: http://localhost:9001 (ROOTNAME/CHANGEME123)
 - **MailHog Web UI**: http://localhost:8025
+- **Redis**: localhost:6379 (redis_password)
+- **PostgreSQL**: localhost:5430 (poll_user/poll_password)
 
 ## 📡 API Endpoints
 
@@ -254,6 +259,8 @@ The scheduler is enabled via the `@EnableScheduling` annotation in the main appl
 
 The [`docker-compose.yml`](docker-compose.yml) includes:
 
+- **PostgreSQL**: Database for data persistence
+- **Redis**: Distributed cache for performance optimization
 - **MinIO**: Object storage for user profile images
 - **RabbitMQ**: Message queue for asynchronous processing
 - **MailHog**: SMTP server for email testing
@@ -316,6 +323,125 @@ The system provides comprehensive pagination support across all major entities:
 - **Event-Driven Updates**: Real-time data consistency through domain events
 - **Asynchronous Processing**: Vote processing maintains data integrity while providing responsive user experience
 - **Status Validation**: Multi-layer validation ensures data consistency across all operations
+
+## 🚀 Cache System
+
+The system implements a robust caching strategy using **Redis** as a distributed cache provider, following the **Cache-Aside (Lazy Loading)** pattern.
+
+### Cache Architecture
+
+#### Implemented Pattern: Cache-Aside (Lazy Loading)
+The system uses the Cache-Aside pattern where:
+1. **Read**: Application checks cache first, if not found (cache miss), queries database and stores in cache
+2. **Write**: Application writes to database and invalidates/updates cache as needed
+3. **TTL**: Data in cache expires automatically after 1 hour to ensure freshness
+
+#### Cache System Components
+
+##### `CacheStore` Interface
+```java
+public interface CacheStore<K, V> {
+    Optional<V> get(K key);
+    void put(K key, V value);
+    void evict(K key);
+}
+```
+
+##### Redis Implementation: `RedisCacheStore`
+- **Technology**: Redis 7 (Alpine)
+- **Serialization**: Jackson JSON with complex type support
+- **TTL**: 1 hour for all data
+- **Connection Pool**: Lettuce (Spring Boot default)
+- **Error Handling**: Graceful degradation - cache failures don't affect functionality
+
+### Cached Entities
+
+#### 1. **Users** (`UserCacheRepositoryJpa`)
+**Cache Strategies:**
+- **By ID**: `user:{userId}` - Primary cache for identifier-based lookups
+- **By Email**: `email:{email}` - Cache for authentication and uniqueness validation
+- **By CPF**: `cpf:{cpf}` - Cache for CPF uniqueness validation
+
+**Implemented Operations:**
+- ✅ **Multi-Key Caching**: One user is cached with multiple keys
+- ✅ **Cache Invalidation**: Coordinated removal of all related keys
+- ✅ **Write-Through**: Data is cached immediately after persistence
+
+
+#### 2. **Poll Options** (`PollOptionCacheRepositoryJpa`)
+**Cache Strategies:**
+- **By ID**: `pollOptionId:{optionId}` - Cache for option validation during voting
+
+**Features:**
+- ✅ **Lazy Loading**: Options are cached only when accessed
+- ✅ **Hit/Miss Tracking**: Cache efficiency monitoring
+- ✅ **Fast Voting**: Accelerates validation during voting process
+
+### Redis Configuration
+
+#### Connection Configuration (`application.properties`)
+```properties
+# Redis Configuration
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=redis_password
+spring.data.redis.timeout=2000ms
+spring.data.redis.database=0
+
+# Connection Pool (Lettuce)
+spring.data.redis.lettuce.pool.max-active=8
+spring.data.redis.lettuce.pool.max-idle=8
+spring.data.redis.lettuce.pool.min-idle=2
+spring.data.redis.lettuce.pool.max-wait=-1ms
+spring.data.redis.lettuce.pool.time-between-eviction-runs=30s
+```
+
+### Cache System Benefits
+
+#### Performance
+- **Latency Reduction**: Sub-millisecond access for frequently accessed data
+- **Database Load Reduction**: Fewer SQL queries for common operations
+- **Scalability**: Distributed cache supports multiple application instances
+
+#### Optimized Use Cases
+1. **Authentication**: Fast login with user cache by email
+2. **Vote Validation**: Instant verification of valid options
+3. **Query APIs**: Accelerated user listing and search
+4. **Uniqueness Validation**: CPF and email uniqueness verified via cache
+
+#### Monitoring and Observability
+- **Structured Logs**: Hit/Miss ratio tracking
+- **Performance Metrics**: Comparative response time
+- **Health Checks**: Automatic Redis availability verification
+- **Graceful Degradation**: System works even with cache unavailable
+
+### Invalidation Strategies
+
+#### Cache Invalidation Patterns
+1. **Write-Through**: Simultaneous cache + database update
+2. **Multi-Key Eviction**: Coordinated removal of related keys
+3. **TTL-Based Expiration**: Automatic expiration after 1 hour
+4. **Manual Eviction**: Explicit invalidation in update/delete operations
+
+#### Coordinated Invalidation Example
+```java
+// When updating user, invalidate all related keys
+cacheStore.evict(user.getId());
+cacheStore.evict("email:" + user.getEmail().getEmail());
+cacheStore.evict("cpf:" + user.getCpf().getCpf());
+```
+
+### Development Considerations
+
+#### Spring Profiles
+- **Development**: Cache active only in `jpa` profile
+- **Testing**: Isolated cache for each test scenario
+- **Production**: Distributed cache with Redis cluster
+
+#### Error Handling
+- **Fallback Strategy**: Cache miss doesn't affect functionality
+- **Exception Handling**: Redis errors are logged but not propagated
+- **Circuit Breaker**: Protection against cascading failures
 
 ## 📝 Contributing
 
