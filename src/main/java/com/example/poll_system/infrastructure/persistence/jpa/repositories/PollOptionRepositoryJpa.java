@@ -13,7 +13,7 @@ import com.example.poll_system.infrastructure.persistence.jpa.entities.PollOptio
 import com.example.poll_system.infrastructure.persistence.jpa.mappers.PollOptionMapper;
 
 @Repository
-@Profile("jpa")
+@Profile("jpa-no-cache")
 public class PollOptionRepositoryJpa implements PollOptionRepository {
 
     @Autowired
