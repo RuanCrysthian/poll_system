@@ -167,7 +167,7 @@ src/main/java/com/example/poll_system/
    docker-compose up -d
    ```
 
-
+3. **SWAGGER UI**: http://localhost:8090/swagger-ui/index.html#/
 
 The application will be available at `http://localhost:8090`
 
@@ -207,27 +207,95 @@ After running `docker-compose up -d`, the following services will be available:
 Key configuration properties in [`application.properties`](src/main/resources/application.properties):
 
 ```properties
-# Server
-server.port=8090
+spring.application.name=poll_system
+server.port = 8090
 
-# RabbitMQ
+# Spring Profiles
+spring.profiles.active=jpa
+
+# RABBITMQ Configuration
 spring.rabbitmq.host=rabbitmq
 spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
 app.rabbitmq.exchange=vote
 app.rabbitmq.vote-queue=vote-queue
+app.rabbitmq.vote-queue-dlq=vote-queue.dlq
+app.rabbitmq.vote-routing-key=voting-key
+app.rabbitmq.vote-routing-key-dlq=voting-key-dlq
 app.rabbitmq.email-queue=email-queue
+app.rabbitmq.email-queue-dlq=email-queue.dlq
+app.rabbitmq.email-routing-key=email-key
+app.rabbitmq.email-routing-key-dlq=email-key-dlq
+app.rabbitmq.email-poll-close.routing-key=email-poll-close-key
+app.rabbitmq.email-poll-close.queue=email-poll-close
+app.rabbitmq..email-poll-close.dlq=email-poll-close.dlq
+app.rabbitmq..email-poll-close.dql-routing-key=email-poll-close.dlq-key
 
-# Email (MailHog)
-spring.mail.host=mailhog
-spring.mail.port=1025
-
-# Retry Configuration
+# RabbitMQ Listener Configuration
 spring.rabbitmq.listener.simple.retry.enabled=true
 spring.rabbitmq.listener.simple.retry.max-attempts=5
+spring.rabbitmq.listener.simple.retry.initial-interval=10000
+spring.rabbitmq.listener.simple.retry.multiplier=2.0
+spring.rabbitmq.listener.simple.retry.max-interval=120000
+spring.rabbitmq.listener.simple.default-requeue-rejected=false
 
-# JWT Authentication
+# MinIO Configuration
+app.minio.url=http://minio:9000
+app.minio.bucket-name=poll-system-bucket
+app.minio.access-key=ROOTNAME
+app.minio.secret-key=CHANGEME123
+
+# Email Configuration
+spring.mail.host=mailhog
+spring.mail.port=1025
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+spring.mail.protocol=smtp
+spring.mail.default-encoding=UTF-8
+
+# Database Configuration
+# PostgreSQL Database
+spring.datasource.url=jdbc:postgresql://postgresql:5432/poll_system_db
+spring.datasource.driverClassName=org.postgresql.Driver
+spring.datasource.username=poll_user
+spring.datasource.password=poll_password
+
+# JPA/Hibernate Configuration
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.format-sql=true
+
+# Flyway Configuration
+spring.flyway.enabled=true
+spring.flyway.baseline-on-migrate=true
+spring.flyway.baseline-version=0
+spring.flyway.locations=classpath:db/migration
+
+# Timezone Configuration
+spring.jackson.time-zone=America/Sao_Paulo
+spring.jpa.properties.hibernate.jdbc.time_zone=America/Sao_Paulo
+
+# JWT Configuration
 app.jwt.secret=mySecretKey123456789012345678901234567890abcdefghijklmnopqrstuvwxyz
 app.jwt.expiration=86400
+
+# Redis Configuration
+spring.data.redis.host=redis
+spring.data.redis.port=6379
+spring.data.redis.password=redis_password
+spring.data.redis.timeout=2000ms
+spring.data.redis.database=0
+
+# Redis Connection Pool (Lettuce - padrão do Spring Boot)
+spring.data.redis.lettuce.pool.max-active=8
+spring.data.redis.lettuce.pool.max-idle=8
+spring.data.redis.lettuce.pool.min-idle=2
+spring.data.redis.lettuce.pool.max-wait=-1ms
+spring.data.redis.lettuce.pool.time-between-eviction-runs=30s
 ```
 
 ## ⏰ Automated Scheduling

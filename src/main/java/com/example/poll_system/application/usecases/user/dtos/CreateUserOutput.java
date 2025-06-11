@@ -1,11 +1,20 @@
 package com.example.poll_system.application.usecases.user.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Dados do usuário criado com sucesso")
 public record CreateUserOutput(
-        String id,
-        String name,
-        String cpf,
-        String email,
-        String imageProfileUrl,
-        String role) {
+                @Schema(description = "ID único do usuário", example = "550e8400-e29b-41d4-a716-446655440000") String id,
+
+                @Schema(description = "Nome completo do usuário", example = "João Silva") String name,
+
+                @Schema(description = "CPF do usuário", example = "12345678901") String cpf,
+
+                @Schema(description = "Email do usuário", example = "joao.silva@email.com") String email,
+
+                @Schema(description = "URL da imagem de perfil do usuário", example = "https://storage.example.com/profile/user123.jpg") String imageProfileUrl,
+
+                @Schema(description = "Papel do usuário no sistema", example = "ADMIN", allowableValues = {
+                                "ADMIN", "VOTER" }) String role){
 
 }

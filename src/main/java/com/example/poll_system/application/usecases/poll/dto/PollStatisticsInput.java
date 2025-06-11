@@ -1,6 +1,9 @@
 package com.example.poll_system.application.usecases.poll.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Dados necessários para buscar estatísticas de uma enquete")
 public record PollStatisticsInput(
-        String pollId) {
+                @Schema(description = "ID único da enquete para obter estatísticas", example = "123e4567-e89b-12d3-a456-426614174000", required = true) String pollId) {
 
 }
