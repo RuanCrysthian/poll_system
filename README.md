@@ -164,7 +164,7 @@ src/main/java/com/example/poll_system/
 
 2. **Start application**
    ```bash
-   docker-compose up -d
+   docker-compose up -d --build
    ```
 
 3. **SWAGGER UI**: http://localhost:8090/swagger-ui/index.html#/
